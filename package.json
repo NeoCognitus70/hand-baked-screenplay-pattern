@@ -1,0 +1,39 @@
+{
+  "name": "hand-baked-screenplay-pattern",
+  "version": "0.1.0",
+  "description": "A hand-baked, dependency-free TypeScript implementation of the Screenplay Pattern, following the design model and naming conventions popularised by Serenity/JS (but independent of it).",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.spec.json",
+    "test": "vitest run",
+    "verify": "npm run typecheck && npm run build && npm test",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "screenplay",
+    "screenplay-pattern",
+    "bdd",
+    "test-automation",
+    "actors",
+    "typescript"
+  ],
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}
