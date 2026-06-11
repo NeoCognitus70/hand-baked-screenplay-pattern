@@ -13,8 +13,17 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeoCognitus70/hand-baked-screenplay-pattern.git"
+  },
+  "homepage": "https://github.com/NeoCognitus70/hand-baked-screenplay-pattern#readme",
+  "bugs": {
+    "url": "https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/issues"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.spec.json",

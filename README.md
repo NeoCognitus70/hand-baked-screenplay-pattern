@@ -174,6 +174,14 @@ spec/            Vitest specs, including an end-to-end worked example
 | `npm test`          | Run the Vitest suite. |
 | `npm run verify`    | typecheck + build + test. |
 
+## Versioning & changelog
+
+This project follows [Semantic Versioning](https://semver.org/). The current
+version is **0.1.0**; while the major version is `0`, the public API may change
+between minor versions. All notable changes are recorded in
+[`CHANGELOG.md`](./CHANGELOG.md), formatted per
+[Keep a Changelog](https://keepachangelog.com/).
+
 ## Relationship to Serenity/JS
 
 Serenity/JS is a mature, full-featured acceptance-testing framework. If you need
