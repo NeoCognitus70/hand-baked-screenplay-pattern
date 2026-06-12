@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_Nothing yet._
+### Added
+
+- **`Outcome` model** (`src/screenplay/Outcome.ts`): a discriminated union of
+  success / assertion-failure / error-failure, with `Outcome.successful()`,
+  `Outcome.from(error?)`, and `Outcome.isSuccessful(...)` — groundwork for
+  static HTML reporting.
+- **Scene and test-run lifecycle events**: the `DomainEvent` union gains
+  `scene:starts`, `scene:finishes` (carrying an `Outcome`), and
+  `test-run:finishes` variants, and every event is now stamped with a
+  `timestamp` (epoch ms) by the `Stage` on announce. Call sites build the new
+  un-stamped `DomainEventInput` shape; crew members keep receiving the full
+  `DomainEvent`. The `Stage` constructor accepts an injectable `now()` clock
+  (defaulting to `Date.now`) and gains `sceneStarts` / `sceneFinishes` /
+  `testRunFinishes` facade methods with matching default-stage functions.
 
 ## [0.1.0] - 2026-06-11
 

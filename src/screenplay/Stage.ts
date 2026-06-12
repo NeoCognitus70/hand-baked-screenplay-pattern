@@ -1,7 +1,8 @@
 import { ConfigurationError } from '../errors/index.js';
 import { Actor } from './Actor.js';
 import { Cast } from './Cast.js';
-import type { DomainEvent, StageCrewMember } from './StageEvents.js';
+import type { Outcome } from './Outcome.js';
+import type { DomainEvent, DomainEventInput, StageCrewMember } from './StageEvents.js';
 
 /**
  * The {@link Stage} is where the performance takes place. It instantiates and
@@ -14,7 +15,10 @@ export class Stage {
   private readonly crew: StageCrewMember[] = [];
   private actorInSpotlight: Actor | undefined;
 
-  constructor(private cast: Cast) {}
+  constructor(
+    private cast: Cast,
+    private readonly now: () => number = () => Date.now(),
+  ) {}
 
   /**
    * Swaps in a new {@link Cast} and dismisses any actors currently in play.
@@ -60,12 +64,37 @@ export class Stage {
   }
 
   /**
-   * Announces a {@link DomainEvent} to every registered crew member.
+   * Stamps the given {@link DomainEventInput} with a `timestamp` (via the
+   * injectable `now()` clock) and announces the resulting
+   * {@link DomainEvent} to every registered crew member.
    */
-  announce(event: DomainEvent): void {
+  announce(event: DomainEventInput): void {
+    const stamped: DomainEvent = { ...event, timestamp: this.now() };
     for (const member of this.crew) {
-      member.notifyOf(event);
+      member.notifyOf(stamped);
     }
+  }
+
+  /**
+   * Announces that a named scene (a test case, in runner terms) has started.
+   */
+  sceneStarts(name: string): void {
+    this.announce({ type: 'scene:starts', name });
+  }
+
+  /**
+   * Announces that a named scene has finished with the given {@link Outcome}.
+   */
+  sceneFinishes(name: string, outcome: Outcome): void {
+    this.announce({ type: 'scene:finishes', name, outcome });
+  }
+
+  /**
+   * Announces that the test run has finished — the terminal signal that lets
+   * reporting crew members render and write their output.
+   */
+  testRunFinishes(): void {
+    this.announce({ type: 'test-run:finishes' });
   }
 }
 
@@ -98,6 +127,28 @@ export function actorCalled(name: string): Actor {
  */
 export function actorInTheSpotlight(): Actor {
   return defaultStage.theActorInTheSpotlight();
+}
+
+/**
+ * Announces on the default {@link Stage} that a named scene has started.
+ */
+export function sceneStarts(name: string): void {
+  defaultStage.sceneStarts(name);
+}
+
+/**
+ * Announces on the default {@link Stage} that a named scene has finished with
+ * the given {@link Outcome}.
+ */
+export function sceneFinishes(name: string, outcome: Outcome): void {
+  defaultStage.sceneFinishes(name, outcome);
+}
+
+/**
+ * Announces on the default {@link Stage} that the test run has finished.
+ */
+export function testRunFinishes(): void {
+  defaultStage.testRunFinishes();
 }
 
 /**

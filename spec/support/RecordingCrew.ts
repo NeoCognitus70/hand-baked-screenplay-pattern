@@ -12,6 +12,8 @@ export class RecordingCrew implements StageCrewMember {
   }
 
   descriptions(): string[] {
-    return this.events.map((event) => `${event.type}:${event.activity}`);
+    return this.events.map((event) =>
+      'activity' in event ? `${event.type}:${event.activity}` : event.type,
+    );
   }
 }
