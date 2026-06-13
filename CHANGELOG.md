@@ -34,6 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stack for unexpected errors). Inline CSS/JS only, no external assets or
   network requests, and no filesystem access. Every piece of dynamic text is
   HTML-escaped against injection.
+- **`HtmlReporter` crew member** (`src/crew/HtmlReporter.ts`): a passive
+  `StageCrewMember` that buffers every event and, on `test-run:finishes`,
+  builds and renders a single static HTML report. `HtmlReporter.storingReportsAt(dir)`
+  (default `./report`) chooses the output directory; `withWriter(writer)` injects
+  a custom `ReportWriter` so tests capture output without touching disk. `node:fs`
+  use is confined to the default filesystem writer.
 
 ## [0.1.0] - 2026-06-11
 
