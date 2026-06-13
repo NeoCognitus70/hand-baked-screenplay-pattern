@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `DomainEvent`. The `Stage` constructor accepts an injectable `now()` clock
   (defaulting to `Date.now`) and gains `sceneStarts` / `sceneFinishes` /
   `testRunFinishes` facade methods with matching default-stage functions.
+- **Report model and pure builder** (`src/reporting/ReportModel.ts`):
+  `ActivityReport` / `SceneReport` / `RunReport` types and `buildReport(events)`,
+  which folds a stamped event stream into a run report using a per-actor
+  activity stack (correct nesting under concurrent actors). No I/O and no
+  clock — timing comes exclusively from event timestamps; orphan events are
+  ignored rather than thrown. Barrel exports follow with the reporting feature.
 
 ## [0.1.0] - 2026-06-11
 
