@@ -153,16 +153,71 @@ const TheTime = Question.about('the current time', (actor) =>
 );
 ```
 
+## Reporting
+
+Beyond the live `ConsoleReporter`, the library can produce a **single,
+self-contained static HTML report** after a run. It is built by listening to the
+same domain events the `Stage` already announces, so no extra instrumentation is
+needed in your tasks.
+
+Group activities into named **scenes** with the runner-agnostic `scene(name, fn)`
+helper, register an `HtmlReporter` crew member, and call `testRunFinishes()` when
+the run is over:
+
+```ts
+import {
+  Cast, actorCalled, engage, assign,
+  scene, testRunFinishes,
+  HtmlReporter,
+  MakeRequests, Send, LastResponse, Ensure, equals,
+} from 'hand-baked-screenplay-pattern';
+
+engage(Cast.whereEveryoneCan(MakeRequests.using(client)));
+assign(HtmlReporter.storingReportsAt('./report'));
+
+await scene('Ada checks the health endpoint', async () => {
+  await actorCalled('Ada').attemptsTo(
+    Send.a({ method: 'GET', url: '/health' }),
+    Ensure.that(LastResponse.status(), equals(200)),
+  );
+});
+
+testRunFinishes();   // writes ./report/index.html
+```
+
+The result is one `index.html` with inline CSS/JS (no external assets or network
+requests) showing a pass/fail summary, each scene's status, its nested activity
+tree with durations, and error details for failures. A failing `scene(...)`
+**re-throws** after recording its outcome, so it still fails your test.
+
+This is **deliberately minimal** — one static, post-run HTML file. It is *not* a
+Serenity/JS reporter: there is no live streaming, no screenshots, no JSON feed,
+and no multi-file dashboard. For production-grade reporting, use Serenity/JS (see
+below).
+
+A few notes:
+
+- `scene` and `testRunFinishes` drive the **default stage**, so they compose with
+  `actorCalled(...)`. If you manage your own `Stage`, use its
+  `sceneStarts` / `sceneFinishes` / `testRunFinishes` methods to wire scenes into
+  your runner's hooks (e.g. an `afterAll`) manually.
+- `HtmlReporter.storingReportsAt(dir)` chooses the output directory (default
+  `./report`). For tests, `.withWriter(writer)` injects a `ReportWriter` so you
+  can capture the HTML without touching disk.
+- Reporting is a `StageCrewMember` that observes events — not an actor `Ability`.
+
 ## Project layout
 
 ```
 src/
-  screenplay/    Actor, Ability, Activity, Task, Interaction, Question, Cast, Stage
+  screenplay/    Actor, Ability, Activity, Task, Interaction, Question, Cast, Stage, Outcome
   expectations/  Ensure + the expectation library (equals, isGreaterThan, ...)
   abilities/     Demo abilities: MakeRequests (HTTP) and ManageData (in-memory store)
-  crew/          ConsoleReporter (a StageCrewMember)
+  crew/          ConsoleReporter and HtmlReporter (StageCrewMembers)
+  reporting/     Pure report builder (buildReport) and HTML renderer (renderHtml)
+  scene/         The scene(name, fn) helper
   errors/        ConfigurationError, LogicError, AssertionError
-spec/            Vitest specs, including an end-to-end worked example
+spec/            Vitest specs, including end-to-end worked examples
 ```
 
 ## Scripts
