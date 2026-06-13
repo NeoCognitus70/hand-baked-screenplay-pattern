@@ -40,6 +40,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (default `./report`) chooses the output directory; `withWriter(writer)` injects
   a custom `ReportWriter` so tests capture output without touching disk. `node:fs`
   use is confined to the default filesystem writer.
+- **`scene(name, fn)` helper** (`src/scene/scene.ts`): the primary,
+  runner-agnostic way to delimit a reportable scene. It announces
+  `scene:starts` on the default stage, runs the body, records the resulting
+  `Outcome` via `scene:finishes`, and **re-throws** on failure so a failing
+  scene still fails the surrounding test.
+- **Reporting feature wired into the public API**: new `src/reporting/index.ts`
+  and `src/scene/index.ts` barrels, and additive exports from the existing
+  barrels — `src/screenplay/index.ts` now exports `Outcome`, the
+  `sceneStarts` / `sceneFinishes` / `testRunFinishes` facade functions, and the
+  `DomainEventInput` type; `src/crew/index.ts` exports `HtmlReporter` and
+  `ReportWriter`; and `src/index.ts` re-exports the `reporting` and `scene`
+  modules. All additions are strictly additive — no existing export changed or
+  removed. An end-to-end spec runs one passing and one failing scene through the
+  public API with an `HtmlReporter` whose writer is injected, then asserts the
+  captured HTML reports 1 pass / 1 fail.
 
 ## [0.1.0] - 2026-06-11
 

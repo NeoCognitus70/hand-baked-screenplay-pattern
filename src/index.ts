@@ -10,4 +10,6 @@ export * from './screenplay/index.js';
 export * from './expectations/index.js';
 export * from './abilities/index.js';
 export * from './crew/index.js';
+export * from './reporting/index.js';
+export * from './scene/index.js';
 export { ConfigurationError, LogicError, AssertionError } from './errors/index.js';
