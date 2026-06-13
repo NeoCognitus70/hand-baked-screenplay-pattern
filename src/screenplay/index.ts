@@ -13,8 +13,12 @@ export {
   assign,
   engage,
   resetDefaultStage,
+  sceneStarts,
+  sceneFinishes,
+  testRunFinishes,
 } from './Stage.js';
-export type { DomainEvent, StageCrewMember } from './StageEvents.js';
+export { Outcome } from './Outcome.js';
+export type { DomainEvent, DomainEventInput, StageCrewMember } from './StageEvents.js';
 export type {
   ActivityActor,
   AnswersQuestions,
