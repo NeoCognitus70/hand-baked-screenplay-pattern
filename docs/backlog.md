@@ -45,8 +45,7 @@ artifact existed after a run, and the `StageCrewMember` concept the library teac
 under-demonstrated.
 **Effort:** 6–10 hours estimated (plan tasks 1–7); delivered across worklist items HBSP-01..08.
 **Status:** ✅ RESOLVED 2026-06-13 — delivered via worklist branches `worklist/static-html-reporting`
-(PR #9), `-2` (PR #10), `-3` (PR #11), `-4` (PR #12), and `-5` (HBSP-07/08). All merged except the
-final `-5` PR awaiting user review.
+(PR #9), `-2` (PR #10), `-3` (PR #11), `-4` (PR #12), and `-5` (HBSP-07/08, PR #13). All merged.
 **Affected Stacks:** TypeScript library (`src/screenplay/`, `src/crew/`, new `src/reporting/`,
 new `src/scene/`)
 
