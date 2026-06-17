@@ -28,6 +28,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.spec.json",
     "test": "vitest run",
+    "coverage": "vitest run --coverage",
     "verify": "npm run typecheck && npm run build && npm test",
     "test:watch": "vitest"
   },
@@ -45,6 +46,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.9",
     "typescript": "^5.7.0",
     "vitest": "^4.1.9"
   }

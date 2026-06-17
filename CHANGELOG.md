@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Coverage reporting (visibility, not a gate).** A `coverage` script
+  (`vitest run --coverage`, via `@vitest/coverage-v8` matching the Vitest 4
+  major) prints a summary and writes a browsable `coverage/` report; CI runs it
+  informationally on Node 20 with no threshold/hard gate (per the review). Also
+  adds an integration spec (`spec/html-reporter-fs.spec.ts`) that drives the
+  `HtmlReporter`'s **real** `node:fs` default writer against an `os.tmpdir()`
+  path — the previously-untested branch every other reporter spec stubs out —
+  asserting a real `index.html` containing `<!DOCTYPE html>` is written.
+
 ### Fixed
 
 - **Report timing is robust to a non-monotonic clock.** `buildReport`
