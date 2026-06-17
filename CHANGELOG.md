@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Report timing is robust to a non-monotonic clock.** `buildReport`
+  (`src/reporting/ReportModel.ts`) now floors every duration at zero
+  (`Math.max(0, ...)`) for activities, scenes, and the run, so a clock that goes
+  backwards can no longer render a negative duration. The run `startedAt` now
+  prefers the first `scene:starts` timestamp, falling back to the first event
+  only when no scene started — a stray pre-scene event can no longer back-date
+  the run.
+
 ### Security
 
 - **Upgraded the dev test toolchain** to clear transitive `esbuild` advisories

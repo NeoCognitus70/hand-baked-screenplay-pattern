@@ -94,14 +94,15 @@ export function buildReport(events: DomainEvent[]): RunReport {
       case 'activity:finishes': {
         const activity = openActivities.get(event.actor)?.pop();
         if (!activity) break; // orphan: nothing open for this actor
-        activity.durationMs = event.timestamp - activity.startedAt;
+        // Floor at zero: a non-monotonic clock must not yield a negative duration.
+        activity.durationMs = Math.max(0, event.timestamp - activity.startedAt);
         break;
       }
 
       case 'activity:fails': {
         const activity = openActivities.get(event.actor)?.pop();
         if (!activity) break; // orphan: nothing open for this actor
-        activity.durationMs = event.timestamp - activity.startedAt;
+        activity.durationMs = Math.max(0, event.timestamp - activity.startedAt);
         activity.outcome = Outcome.from(event.error);
         break;
       }
@@ -109,7 +110,7 @@ export function buildReport(events: DomainEvent[]): RunReport {
       case 'scene:finishes':
         if (!currentScene) break; // orphan: no open scene
         currentScene.outcome = event.outcome;
-        currentScene.durationMs = event.timestamp - currentScene.startedAt;
+        currentScene.durationMs = Math.max(0, event.timestamp - currentScene.startedAt);
         currentScene = undefined;
         openActivities = new Map();
         break;
@@ -120,7 +121,11 @@ export function buildReport(events: DomainEvent[]): RunReport {
     }
   }
 
-  const startedAt = events.length > 0 ? events[0].timestamp : 0;
+  // Prefer the first scene's start as the run start: a stray pre-scene event (or a
+  // non-monotonic clock) must not make the run appear to start before its first scene.
+  // Fall back to the first event only when no scene started at all.
+  const startedAt =
+    scenes.length > 0 ? scenes[0].startedAt : events.length > 0 ? events[0].timestamp : 0;
   const finishedAt =
     runFinishedAt ?? (events.length > 0 ? events[events.length - 1].timestamp : 0);
   const succeeded = scenes.filter((scene) => Outcome.isSuccessful(scene.outcome)).length;
@@ -128,7 +133,7 @@ export function buildReport(events: DomainEvent[]): RunReport {
   return {
     startedAt,
     finishedAt,
-    durationMs: finishedAt - startedAt,
+    durationMs: Math.max(0, finishedAt - startedAt),
     total: scenes.length,
     succeeded,
     failed: scenes.length - succeeded,

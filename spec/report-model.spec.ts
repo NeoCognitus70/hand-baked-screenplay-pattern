@@ -145,8 +145,43 @@ describe('buildReport', () => {
     expect(report.total).toBe(1);
     expect(report.succeeded).toBe(1);
     expect(report.scenes[0].activities).toEqual([]);
-    expect(report.startedAt).toBe(10);
+    // The run starts at its first *scene* (40), not the stray pre-scene activity (10):
+    // a stray event before any scene must not back-date the run.
+    expect(report.startedAt).toBe(40);
     expect(report.finishedAt).toBe(60); // falls back to the last event timestamp
+    expect(report.durationMs).toBe(20);
+  });
+
+  it('never reports a negative duration under a non-monotonic clock', () => {
+    // Finishes arrive with timestamps earlier than their matching starts, and the
+    // run's last event predates its first scene — a clock that went backwards.
+    const nonMonotonic: DomainEvent[] = [
+      { type: 'scene:starts', name: 'Backwards scene', timestamp: 1000 },
+      starts('Ada', '#actor does a thing', 1100), // task
+      starts('Ada', '#actor does a child thing', 1200), // child interaction
+      finishes('Ada', '#actor does a child thing', 900), // clock went backwards
+      fails('Ada', '#actor does a thing', new AssertionError('boom'), 800),
+      {
+        type: 'scene:finishes',
+        name: 'Backwards scene',
+        outcome: Outcome.successful(),
+        timestamp: 700,
+      },
+      { type: 'test-run:finishes', timestamp: 500 },
+    ];
+
+    const report = buildReport(nonMonotonic);
+    const [scene] = report.scenes;
+    const [task] = scene.activities;
+
+    // Every rendered duration is floored at zero.
+    expect(report.durationMs).toBeGreaterThanOrEqual(0);
+    expect(scene.durationMs).toBeGreaterThanOrEqual(0);
+    expect(task.durationMs).toBeGreaterThanOrEqual(0);
+    expect(task.children[0].durationMs).toBeGreaterThanOrEqual(0);
+
+    // The run does not start before its first scene.
+    expect(report.startedAt).toBe(1000);
   });
 
   it('returns an empty report for an empty event stream', () => {
