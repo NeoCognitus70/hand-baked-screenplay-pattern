@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Upgraded the dev test toolchain** to clear transitive `esbuild` advisories
+  (GHSA-67mh-4wv8-2f99, and the RCE GHSA-gv7w-rqvm-qjhr / CVSS 8.1) pulled in via
+  `vite` / `@vitest/mocker` under `vitest@^2`. Bumped `vitest` to `^4.1.9` (a
+  major, **dev-only** — no runtime dependency changed). `npm audit` now reports
+  0 vulnerabilities (was 1 critical + 2 high + 2 moderate). The Vitest config
+  needed no migration; `npm run verify` stays green at 47 tests.
+
 ### Added
 
 - **`Outcome` model** (`src/screenplay/Outcome.ts`): a discriminated union of
