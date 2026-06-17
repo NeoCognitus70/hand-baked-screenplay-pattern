@@ -37,7 +37,7 @@ npm install
 npm run verify   # typecheck + build + test
 ```
 
-This package targets Node.js 18+ and is shipped as native ES modules.
+This package targets Node.js 20+ and is shipped as native ES modules.
 
 ## The building blocks
 
