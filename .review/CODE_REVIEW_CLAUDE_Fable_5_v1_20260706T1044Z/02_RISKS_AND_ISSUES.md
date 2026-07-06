@@ -255,10 +255,24 @@ ranges. Licence: Apache-2.0 declared in [package.json](package.json) (line 43) w
 the full text in [LICENSE](LICENSE) - clean. No secrets in the tree; the only
 injection surface (report HTML) is escaped and tested.
 
+**Stale Dependabot alerts (checked via the GitHub API during this review):** the
+repository's default branch shows **2 open Dependabot alerts** - GHSA-fx2h-pf6j-xcff
+(high, "vite `server.fs.deny` bypass on Windows alternate paths") and
+GHSA-v6wh-96g9-6wx3 (medium, "launch-editor NTLMv2 hash disclosure"), both with
+vulnerable range `<= 6.4.2`, first patched in `6.4.3`. The committed lockfile
+resolves `vite@8.0.16` (dev-only, transitive under `vitest@4`), which is **outside
+the vulnerable range** - consistent with the clean local `npm audit`. These alerts
+are therefore stale scan results, not live vulnerabilities: the same Dependabot
+re-scan lag this repo already saw after the HBSP-09 bump.
+
 **Refactor Recommendation and Strategy**
 - Take the vitest patch opportunistically with the next functional change; treat
   TypeScript 6 as a deliberate, gated upgrade; revisit `@types/node` only when the
   CI matrix moves.
+- Dismiss the two stale Dependabot alerts in the repository's Security tab (or
+  trigger a re-scan) so the default branch's security banner matches the actual
+  lockfile state - a red "1 high" badge on a portfolio repo costs credibility the
+  dependency work has already earned back.
 
 ---
 

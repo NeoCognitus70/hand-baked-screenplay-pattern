@@ -33,6 +33,13 @@ found 0 vulnerabilities
 Confirms the HBSP-09 closure (previously 1 critical + 2 high + 2 moderate, all
 esbuild-transitive under vitest 2).
 
+Cross-check against GitHub (Dependabot alerts API, this session): 2 alerts remain
+**open** on the default branch - GHSA-fx2h-pf6j-xcff (high) and GHSA-v6wh-96g9-6wx3
+(medium), both `vite <= 6.4.2`, patched in `6.4.3`. The lockfile resolves
+`vite@8.0.16` (dev-scope, transitive under vitest 4), outside the vulnerable range,
+so both alerts are stale rather than live - see Risk 7 for the recommended
+dismissal/re-scan.
+
 ## Dependency currency (`npm outdated`)
 
 | Package             | Current  | Wanted  | Latest | Note |
