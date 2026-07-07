@@ -190,6 +190,10 @@ requests) showing a pass/fail summary, each scene's status, its nested activity
 tree with durations, and error details for failures. A failing `scene(...)`
 **re-throws** after recording its outcome, so it still fails your test.
 
+Reporting is **one report per run**: a successful write on `testRunFinishes()`
+clears the reporter's event buffer, so a reporter that observes a second run
+renders only that run's scenes (each write replaces `index.html`).
+
 This is **deliberately minimal** — one static, post-run HTML file. It is *not* a
 Serenity/JS reporter: there is no live streaming, no screenshots, no JSON feed,
 and no multi-file dashboard. For production-grade reporting, use Serenity/JS (see

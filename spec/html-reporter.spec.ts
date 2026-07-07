@@ -62,6 +62,34 @@ describe('HtmlReporter', () => {
     expect(writer.mock.calls[0][0]).toBe('build/reports/index.html');
   });
 
+  it('clears its buffer after a write, so a second run is not double-counted', () => {
+    const writer = vi.fn<Parameters<ReportWriter>, void>();
+    const reporter = HtmlReporter.storingReportsAt().withWriter(writer);
+
+    // First run: the passing "Ada checks the health endpoint" scene.
+    for (const event of passingRun) reporter.notifyOf(event);
+
+    // Second run observed by the SAME reporter instance: one different scene.
+    const secondRun: DomainEvent[] = [
+      { type: 'scene:starts', name: 'Bob checks the version endpoint', timestamp: 200 },
+      {
+        type: 'scene:finishes',
+        name: 'Bob checks the version endpoint',
+        outcome: Outcome.successful(),
+        timestamp: 210,
+      },
+      { type: 'test-run:finishes', timestamp: 220 },
+    ];
+    for (const event of secondRun) reporter.notifyOf(event);
+
+    expect(writer).toHaveBeenCalledTimes(2);
+    const secondHtml = writer.mock.calls[1][1];
+    // The second report holds only the second run's scene — the first run's
+    // scene must not leak in (the pre-fix behaviour double-counted it).
+    expect(secondHtml).toContain('Bob checks the version endpoint');
+    expect(secondHtml).not.toContain('Ada checks the health endpoint');
+  });
+
   it('reports the run outcome the buffered events describe', () => {
     const writer = vi.fn<Parameters<ReportWriter>, void>();
     const reporter = HtmlReporter.storingReportsAt().withWriter(writer);

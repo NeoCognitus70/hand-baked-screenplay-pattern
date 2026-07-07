@@ -38,6 +38,10 @@ function joinPath(directory: string, file: string): string {
  * events — it is not an actor `Ability`. The class is passive: it reacts only
  * to the events the `Stage` announces.
  *
+ * Buffering is **per run**: a successful write on `test-run:finishes` clears
+ * the buffer, so a reporter observing a second run renders only that run's
+ * scenes — earlier runs are never double-counted.
+ *
  * @example
  * ```ts
  * assign(HtmlReporter.storingReportsAt('./report'));
@@ -72,12 +76,18 @@ export class HtmlReporter implements StageCrewMember {
     return next;
   }
 
-  /** Buffers every event; renders and writes once on `test-run:finishes`. */
+  /**
+   * Buffers every event; renders, writes, and resets once on
+   * `test-run:finishes` — one report per run.
+   */
   notifyOf(event: DomainEvent): void {
     this.events.push(event);
     if (event.type === 'test-run:finishes') {
       const html = renderHtml(buildReport(this.events));
       this.writer(joinPath(this.directory, 'index.html'), html);
+      // A successful write ends this run's buffer; a failed write (writer threw
+      // above) keeps the events, so nothing is lost to a transient I/O error.
+      this.events.length = 0;
     }
   }
 }
