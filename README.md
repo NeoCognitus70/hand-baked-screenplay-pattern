@@ -241,6 +241,10 @@ between minor versions. All notable changes are recorded in
 [`CHANGELOG.md`](./CHANGELOG.md), formatted per
 [Keep a Changelog](https://keepachangelog.com/).
 
+The package publishes its compiled `dist/` (built from source, git-ignored), so
+a `prepublishOnly` hook runs `npm run verify` (typecheck + build + tests) before
+any `npm publish` — the tarball can never ship a missing or stale build.
+
 ## Relationship to Serenity/JS
 
 Serenity/JS is a mature, full-featured acceptance-testing framework. If you need

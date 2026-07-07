@@ -30,7 +30,8 @@
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "verify": "npm run typecheck && npm run build && npm test",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run verify"
   },
   "keywords": [
     "screenplay",
