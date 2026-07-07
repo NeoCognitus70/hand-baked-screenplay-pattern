@@ -51,7 +51,9 @@ export interface RunReport {
  * The builder is deliberately defensive: orphan `activity:*` events (no open
  * scene, or a finish/fail with nothing on that actor's stack) and orphan
  * `scene:finishes` events are ignored rather than thrown, so a crashed run
- * still renders a partial report.
+ * still renders a partial report. A scene that starts but never finishes is
+ * reported as failed (interrupted), not passed — the partial report must not
+ * read as green in exactly the crashed-run case it exists to survive.
  */
 export function buildReport(events: DomainEvent[]): RunReport {
   const scenes: SceneReport[] = [];
@@ -119,6 +121,21 @@ export function buildReport(events: DomainEvent[]): RunReport {
         runFinishedAt = event.timestamp;
         break;
     }
+  }
+
+  // Crash truth: a scene still open when the fold ends never got its real outcome,
+  // so its initial placeholder must not stand as a pass. Report it as interrupted,
+  // with its duration running to the end of the fold (floored, as everywhere).
+  if (currentScene) {
+    currentScene.outcome = Outcome.from(
+      new Error(
+        `Scene "${currentScene.name}" started but never finished — the run ended while it was still open (interrupted)`,
+      ),
+    );
+    const endOfFold =
+      runFinishedAt ??
+      (events.length > 0 ? events[events.length - 1].timestamp : currentScene.startedAt);
+    currentScene.durationMs = Math.max(0, endOfFold - currentScene.startedAt);
   }
 
   // Prefer the first scene's start as the run start: a stray pre-scene event (or a

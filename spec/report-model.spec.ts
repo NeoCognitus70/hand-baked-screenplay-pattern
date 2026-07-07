@@ -184,6 +184,42 @@ describe('buildReport', () => {
     expect(report.startedAt).toBe(1000);
   });
 
+  it('reports a scene that starts but never finishes as not passed (crash truth)', () => {
+    // A crashed run: the scene opens, an activity begins, the run ends —
+    // no scene:finishes ever arrives. The placeholder outcome must not stand.
+    const interrupted: DomainEvent[] = [
+      { type: 'scene:starts', name: 'Ada is interrupted mid-scene', timestamp: 100 },
+      starts('Ada', '#actor begins a task that never completes', 110),
+      { type: 'test-run:finishes', timestamp: 160 },
+    ];
+
+    const report = buildReport(interrupted);
+    const [scene] = report.scenes;
+
+    expect(report.total).toBe(1);
+    expect(report.succeeded).toBe(0);
+    expect(report.failed).toBe(1);
+    expect(Outcome.isSuccessful(scene.outcome)).toBe(false);
+    expect(scene.outcome).toMatchObject({ status: 'failure', kind: 'error' });
+    expect(
+      scene.outcome.status === 'failure' ? scene.outcome.error.message : '',
+    ).toContain('never finished');
+    // Duration runs to the end of the fold, floored as everywhere.
+    expect(scene.durationMs).toBe(60);
+  });
+
+  it('floors an interrupted scene duration at zero under a non-monotonic clock', () => {
+    const interruptedBackwards: DomainEvent[] = [
+      { type: 'scene:starts', name: 'Backwards interrupted scene', timestamp: 1000 },
+      { type: 'test-run:finishes', timestamp: 400 }, // clock went backwards
+    ];
+
+    const [scene] = buildReport(interruptedBackwards).scenes;
+
+    expect(Outcome.isSuccessful(scene.outcome)).toBe(false);
+    expect(scene.durationMs).toBe(0);
+  });
+
   it('returns an empty report for an empty event stream', () => {
     expect(buildReport([])).toEqual({
       startedAt: 0,
