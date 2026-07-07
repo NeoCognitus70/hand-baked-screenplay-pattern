@@ -1,6 +1,6 @@
 {
   "name": "hand-baked-screenplay-pattern",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A hand-baked, dependency-free TypeScript implementation of the Screenplay Pattern, following the design model and naming conventions popularised by Serenity/JS (but independent of it).",
   "type": "module",
   "main": "./dist/index.js",

@@ -7,44 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+## [0.2.0] - 2026-07-07
 
-- **Coverage reporting (visibility, not a gate).** A `coverage` script
-  (`vitest run --coverage`, via `@vitest/coverage-v8` matching the Vitest 4
-  major) prints a summary and writes a browsable `coverage/` report; CI runs it
-  informationally on Node 20 with no threshold/hard gate (per the review). Also
-  adds an integration spec (`spec/html-reporter-fs.spec.ts`) that drives the
-  `HtmlReporter`'s **real** `node:fs` default writer against an `os.tmpdir()`
-  path — the previously-untested branch every other reporter spec stubs out —
-  asserting a real `index.html` containing `<!DOCTYPE html>` is written.
-
-### Fixed
-
-- **Report timing is robust to a non-monotonic clock.** `buildReport`
-  (`src/reporting/ReportModel.ts`) now floors every duration at zero
-  (`Math.max(0, ...)`) for activities, scenes, and the run, so a clock that goes
-  backwards can no longer render a negative duration. The run `startedAt` now
-  prefers the first `scene:starts` timestamp, falling back to the first event
-  only when no scene started — a stray pre-scene event can no longer back-date
-  the run.
-
-### Security
-
-- **Upgraded the dev test toolchain** to clear transitive `esbuild` advisories
-  (GHSA-67mh-4wv8-2f99, and the RCE GHSA-gv7w-rqvm-qjhr / CVSS 8.1) pulled in via
-  `vite` / `@vitest/mocker` under `vitest@^2`. Bumped `vitest` to `^4.1.9` (a
-  major, **dev-only** — no runtime dependency changed). `npm audit` now reports
-  0 vulnerabilities (was 1 critical + 2 high + 2 moderate). The Vitest config
-  needed no migration; `npm run verify` stays green at 47 tests.
-
-### Changed
-
-- **Reconciled the supported Node.js floor to 20.** The README claimed "Node.js
-  18+" while CI only ever built/tested Node 20 and 22, and `package.json`
-  declared no `engines` field. Node 18 reached end-of-life on 2025-04-30, so the
-  floor is now Node 20 across all three: README reads "Node.js 20+",
-  `package.json` declares `"engines": { "node": ">=20" }`, and the CI matrix
-  (already `[20, 22]`) is unchanged.
+Static HTML reporting, a crash-truth reporting fix, npm publish-safety, and a
+dev-toolchain security upgrade.
 
 ### Added
 
@@ -94,6 +60,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   removed. An end-to-end spec runs one passing and one failing scene through the
   public API with an `HtmlReporter` whose writer is injected, then asserts the
   captured HTML reports 1 pass / 1 fail.
+- **Coverage reporting (visibility, not a gate).** A `coverage` script
+  (`vitest run --coverage`, via `@vitest/coverage-v8` matching the Vitest 4
+  major) prints a summary and writes a browsable `coverage/` report; CI runs it
+  informationally on Node 20 with no threshold/hard gate (per the review). Also
+  adds an integration spec (`spec/html-reporter-fs.spec.ts`) that drives the
+  `HtmlReporter`'s **real** `node:fs` default writer against an `os.tmpdir()`
+  path — the previously-untested branch every other reporter spec stubs out —
+  asserting a real `index.html` containing `<!DOCTYPE html>` is written.
+
+### Changed
+
+- **Reconciled the supported Node.js floor to 20.** The README claimed "Node.js
+  18+" while CI only ever built/tested Node 20 and 22, and `package.json`
+  declared no `engines` field. Node 18 reached end-of-life on 2025-04-30, so the
+  floor is now Node 20 across all three: README reads "Node.js 20+",
+  `package.json` declares `"engines": { "node": ">=20" }`.
+- **Guarded the npm publish path.** A `prepublishOnly` hook runs `npm run verify`
+  (typecheck + build + tests) before any `npm publish`, so the published tarball
+  — which ships the git-ignored `dist/` — can never be a missing or stale build.
+- **Aligned CI to the portfolio baseline.** `actions/checkout` and
+  `actions/setup-node` bumped to v5, the verify matrix extended to
+  `[20, 22, 24]`, and the `vitest` / `@vitest/coverage-v8` dev pair taken to the
+  `4.1.10` patch.
+- **Internal tidy (no public behaviour change).** `Actor.answer` drops a
+  redundant promise branch, and the default-stage tests reset via `afterEach` so
+  a failing assertion cannot leak default-stage state into a later test.
+
+### Fixed
+
+- **Report timing is robust to a non-monotonic clock.** `buildReport`
+  (`src/reporting/ReportModel.ts`) now floors every duration at zero
+  (`Math.max(0, ...)`) for activities, scenes, and the run, so a clock that goes
+  backwards can no longer render a negative duration. The run `startedAt` now
+  prefers the first `scene:starts` timestamp, falling back to the first event
+  only when no scene started — a stray pre-scene event can no longer back-date
+  the run.
+- **A crashed run no longer reads as green.** A scene that starts but never
+  finishes — the run ended while it was still open — is reported as failed
+  (interrupted) and excluded from the success count, instead of standing at its
+  initial `successful()` placeholder. The partial-report path the builder
+  documents surviving now tells the truth.
+- **`HtmlReporter` no longer double-counts across runs.** The event buffer is
+  cleared after each written report, so a reporter that observes a second run
+  renders only that run's scenes rather than re-counting the first run's.
+
+### Security
+
+- **Upgraded the dev test toolchain** to clear transitive `esbuild` advisories
+  (GHSA-67mh-4wv8-2f99, and the RCE GHSA-gv7w-rqvm-qjhr / CVSS 8.1) pulled in via
+  `vite` / `@vitest/mocker` under `vitest@^2`. Bumped `vitest` to `^4.1.10` (a
+  major from v2, **dev-only** — no runtime dependency changed). `npm audit` now
+  reports 0 vulnerabilities (was 1 critical + 2 high + 2 moderate). The Vitest
+  config needed no migration.
 
 ## [0.1.0] - 2026-06-11
 
@@ -134,5 +153,6 @@ depending on it.
 - **Planning** (`planning/`): a tooling-agnostic implementation plan for a
   forthcoming static HTML reporter.
 
-[Unreleased]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/releases/tag/v0.1.0
