@@ -7,12 +7,12 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
-**Version:** 4 — folded in the review-derived cycle (HBSP-09..14) as Resolved Items #2–#7
-**Last Updated:** 2026-06-22
-**Based on:** repo at commit `120a631` (`main`, PR #17 merged); review-derived worklist
-HBSP-09..14 (all merged, PRs #15–#17), itself derived from code review
-`.review/CODE_REVIEW_CLAUDE_Opus_4_8_v1_20260616T1543Z/`. Item #1 traces to the earlier survey at
-commit `a138aa8` (README, `planning/`, CI workflow, package scripts).
+**Version:** 5 — folded in the second review-derived cycle (HBSP-15..22) as Resolved Items #8–#15
+**Last Updated:** 2026-07-07
+**Based on:** repo at commit `8ecd282` (`main`, PRs #19–#25 merged); second review-derived worklist
+HBSP-15..22, derived from code review `.review/CODE_REVIEW_CLAUDE_Fable_5_v1_20260706T1044Z/`.
+Prior: v4 folded in HBSP-09..14 (PRs #15–#17) from review `…Opus_4_8_v1_20260616T1543Z`; Item #1
+traces to the earlier survey at commit `a138aa8` (README, `planning/`, CI workflow, package scripts).
 
 This backlog tracks outstanding work and risks for the hand-baked Screenplay pattern teaching
 library, ordered by priority score (highest first). It is the project's **source of truth** for
@@ -170,6 +170,100 @@ RESOLVED status was already right — only the narrative predated the merge). No
 
 ---
 
+### Second review-derived cycle (HBSP-15..22) — Resolved 2026-07-07
+
+A second code review (`.review/CODE_REVIEW_CLAUDE_Fable_5_v1_20260706T1044Z/`, identity
+CLAUDE_Fable_5) on 2026-07-06 raised one MEDIUM process risk, two low-medium/low correctness fixes,
+three low hygiene items, and one informational item — **no HIGH findings**. Derived into worklist
+items HBSP-15..22 and delivered across PRs #19–#25 (merged 2026-07-07), plus one ops action.
+All gated green on `npm run verify`. Release **0.2.0** was cut (HBSP-21). Statuses authoritative.
+
+#### Item #8: Backlog v4 reconciliation was uncommitted — committed `main` was a full cycle stale — Score: 12 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (2) + Breakage Probability (4) + Maintenance Burden (6) = **12 points**
+**Impact:** The v4 reconciliation (recording the whole HBSP-09..14 cycle) existed only as an
+uncommitted working-tree edit; committed `main` still carried v3, so anyone cloning the repo saw a
+source of truth a full cycle behind reality.
+**Status:** ✅ RESOLVED 2026-07-07 (HBSP-15, commit `94a99e8`, PR #19). v4 content committed
+unchanged via a separate docs-only PR (review PR #18 stayed artefacts-only). Review Risk 1 (MEDIUM).
+**Affected Stacks:** docs (`docs/backlog.md`).
+
+#### Item #9: buildReport rendered a never-finished scene as passed (false green) — Score: 9 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (5) + Maintenance Burden (4) = **9 points**
+**Impact:** A scene's outcome was initialised to `successful()` on `scene:starts` and only replaced
+on `scene:finishes`, so a run that crashed mid-scene rendered the interrupted scene as **passed
+(0ms)** — a false green in exactly the degraded case the builder documents surviving.
+**Status:** ✅ RESOLVED 2026-07-07 (HBSP-16, commit `92efde3`, PR #20). A scene still open when the
+fold ends is now reported as failed (interrupted error naming the scene), excluded from `succeeded`,
+duration run to end-of-fold and floored ≥ 0. +2 specs. Review Risk 2 (LOW-MEDIUM).
+**Affected Stacks:** `src/reporting/ReportModel.ts` + `spec/`.
+
+#### Item #10: HtmlReporter double-counted scenes across runs — Score: 5 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (3) + Maintenance Burden (2) = **5 points**
+**Impact:** The event buffer was push-only, so a reporter observing two runs rendered the first
+run's scenes again inside the second report (wrong output, no crash).
+**Status:** ✅ RESOLVED 2026-07-07 (HBSP-17, commit `a30873b`, PR #21). Buffer cleared after a
+successful write (kept on a failed write, so a transient I/O error loses nothing). +1 two-runs spec;
+README per-run note added. Review Risk 3 (LOW).
+**Affected Stacks:** `src/crew/HtmlReporter.ts` + `spec/` + README.
+
+#### Item #11: npm publish path unguarded (could ship a missing/stale dist) — Score: 5 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (1) + Breakage Probability (2) + Maintenance Burden (2) = **5 points**
+**Impact:** The manifest ships `dist/` (git-ignored) with no publish lifecycle hook — `npm publish`
+from a clean clone could ship a missing or stale build.
+**Status:** ✅ RESOLVED 2026-07-07 (HBSP-18, commit `b47c513`, PR #22). Added
+`"prepublishOnly": "npm run verify"`; README Versioning note. Chose `prepublishOnly` over
+`"private": true` since the manifest advertises publishability. Review Risk 4 (LOW).
+**Affected Stacks:** `package.json` + README.
+
+#### Item #12: CI actions behind the portfolio baseline; vitest patch drift — Score: 4 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (2) + Maintenance Burden (2) = **4 points**
+**Impact:** `ci.yml` pinned `checkout@v4` / `setup-node@v4` (portfolio baseline is v5, ahead of the
+Actions Node-24 runtime cutover); `vitest` had drifted a patch behind.
+**Status:** ✅ RESOLVED 2026-07-07 (HBSP-19, commit `bc43ccd`, PR #23). `checkout@v5`,
+`setup-node@v5`, matrix `[20, 22, 24]`, `vitest` / `@vitest/coverage-v8` → `^4.1.10`; all three
+matrix cells green; `npm audit` 0. Review Risk 5 (LOW) + Risk 7 patch-drift. Precedent: sudoku SUD-08.
+**Affected Stacks:** `.github/workflows/ci.yml` + `package.json`.
+
+#### Item #13: Code/test hygiene — redundant Actor.answer branch; leaky test teardowns — Score: 3 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (1) + Maintenance Burden (2) = **3 points**
+**Impact:** `Actor.answer` had two identical `return answerable` arms behind a no-op `isPromise`
+check; `stage-and-cast.spec.ts` reset the default stage inline, so a failing assertion leaked
+default-stage state into later tests.
+**Status:** ✅ RESOLVED 2026-07-07 (HBSP-20, commit `fce5c0e`, PR #24). Branch + unused import
+removed; teardowns moved to `afterEach`. No behaviour change (81 tests unchanged on that branch).
+Review Recommendations (LOW).
+**Affected Stacks:** `src/screenplay/Actor.ts` + `spec/`.
+
+#### Item #14: CHANGELOG had duplicate Added headings; 0.2.0 release overdue — Score: 3 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (0) + Maintenance Burden (3) = **3 points**
+**Impact:** `[Unreleased]` carried two `### Added` headings (Keep-a-Changelog / MD024 break) and a
+whole feature stream while 0.1.0 was the only release.
+**Status:** ✅ RESOLVED 2026-07-07 (HBSP-21, commit `cdd7b90`, PR #25). Cut `## [0.2.0]` (one
+heading per change type, Keep-a-Changelog order); compare links updated; `package.json` → `0.2.0`.
+Review Risk 6 (LOW).
+**Affected Stacks:** `CHANGELOG.md` + `package.json`.
+
+#### Item #15: Two stale Dependabot `vite` alerts on the default branch — Score: 2 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (1) + Breakage Probability (0) + Maintenance Burden (1) = **2 points**
+**Impact:** The default branch showed 2 open Dependabot alerts (#2 high, #3 medium, both `vite`,
+range `<= 6.4.2`) while the committed lockfile resolves `vite@8.0.16` and `npm audit` = 0 — re-scan
+lag, not live vulnerabilities, but a red badge on a portfolio repo.
+**Status:** ✅ RESOLVED 2026-07-07 (HBSP-22, ops — no repo change). Verified `vite@8.0.16` in the
+committed lockfile and `npm audit` 0 **before** acting; dismissed both via `gh api PATCH`
+(`dismissed_reason=inaccurate`) with an evidence comment. **0 open Dependabot alerts.** Review Risk 7
+(informational).
+**Affected Stacks:** none (GitHub security tab only).
+
+---
+
 ## Risk Summary
 
 | Priority | Count | Total Effort | Status Distribution |
@@ -178,7 +272,7 @@ RESOLVED status was already right — only the narrative predated the merge). No
 | MEDIUM (10–19) | 0 | — | — |
 | LOW (0–9) | 0 | — | — |
 | **Total Outstanding** | **0** | **—** | |
-| Resolved | 7 | — | 1 RESOLVED (2026-06-13, Item #1); 6 RESOLVED (2026-06-17, Items #2–#7 / HBSP-09..14) |
+| Resolved | 15 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07) |
 
 ---
 
@@ -186,9 +280,10 @@ RESOLVED status was already right — only the narrative predated the merge). No
 
 ### HIGH Priority
 
-None. **Static HTML reporting** (Item #1) and the review-derived cycle (Items #2–#7 / HBSP-09..14)
-are all Resolved. The project is at a natural resting point — no open PRs, `npm run verify` green at
-81 tests, `npm audit` clean.
+None. **Static HTML reporting** (Item #1) and both review-derived cycles (Items #2–#7 / HBSP-09..14,
+and Items #8–#15 / HBSP-15..22) are all Resolved. The project is at a natural resting point —
+no open PRs, `npm run verify` green at **84 tests** on `main` `8ecd282`, `npm audit` clean, release
+**0.2.0** cut, 0 open Dependabot alerts.
 
 ### MEDIUM Priority
 
@@ -198,7 +293,7 @@ None yet.
 
 None yet.
 
-> A second code review or a fresh survey would be the natural source of the next items — there is
+> A third code review or a fresh survey would be the natural source of the next items — there is
 > no outstanding work to schedule from the current evidence.
 
 ---
