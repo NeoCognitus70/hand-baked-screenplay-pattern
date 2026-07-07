@@ -1,5 +1,4 @@
 import { ConfigurationError } from '../errors/index.js';
-import { isPromise } from '../util.js';
 import { Ability, type AbilityType } from './Ability.js';
 import type { Activity } from './Activity.js';
 import type { Answerable } from './Answerable.js';
@@ -79,9 +78,8 @@ export class Actor
     if (Question.isAQuestion<Promise<T> | T>(answerable)) {
       return this.answer(answerable.answeredBy(this));
     }
-    if (isPromise<T>(answerable)) {
-      return answerable;
-    }
+    // A plain value or a Promise: an async method resolves either identically,
+    // so no Promise-specific branch is needed here.
     return answerable;
   }
 

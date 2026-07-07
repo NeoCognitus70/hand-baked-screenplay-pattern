@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
   Cast,
   ConfigurationError,
@@ -81,6 +81,12 @@ describe('Stage event timestamps', () => {
 });
 
 describe('Scene and test-run lifecycle events', () => {
+  // Reset the default stage after every test so a failing assertion cannot leak
+  // default-stage state into a later test — teardown runs even when a test throws.
+  afterEach(() => {
+    resetDefaultStage();
+  });
+
   it('announces scene:starts, scene:finishes, and test-run:finishes via the Stage facade', () => {
     const stage = new Stage(Cast.whereEveryoneCan(), () => 1000);
     const crew = new RecordingCrew();
@@ -119,12 +125,14 @@ describe('Scene and test-run lifecycle events', () => {
     ]);
     const finish = crew.events[1];
     expect(finish.type === 'scene:finishes' && finish.outcome.status).toBe('failure');
-
-    resetDefaultStage();
   });
 });
 
 describe('Default stage helpers', () => {
+  afterEach(() => {
+    resetDefaultStage();
+  });
+
   it('actorCalled and actorInTheSpotlight operate on the default stage', () => {
     resetDefaultStage();
     engage(Cast.whereEveryoneCan());
@@ -132,7 +140,5 @@ describe('Default stage helpers', () => {
     const alice = actorCalled('Alice');
     expect(actorCalled('Alice')).toBe(alice);
     expect(actorInTheSpotlight()).toBe(alice);
-
-    resetDefaultStage();
   });
 });
