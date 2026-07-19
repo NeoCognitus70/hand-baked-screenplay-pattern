@@ -2,7 +2,7 @@
 
 > **Audience:** Anyone who has read [Guide 01](./01-screenplay-flow.md) and wants
 > to understand how the library surfaces what actors are doing — for logging,
-> debugging, and (soon) reporting.
+> debugging, and reporting.
 >
 > **You'll learn:** the domain-event model, how the `Stage` broadcasts events to
 > its crew, how to write your own `StageCrewMember`, and how the flat event
@@ -40,13 +40,19 @@ graph LR
 ## 2. The domain-event model
 
 Defined in [`src/screenplay/StageEvents.ts`](../src/screenplay/StageEvents.ts).
-Today the events are **activity-level**:
+The events span **activity, scene, and run level**, and every event a crew
+member receives is stamped with a `timestamp` by the `Stage`:
 
 ```ts
-export type DomainEvent =
+export type DomainEventInput =
   | { readonly type: 'activity:starts';   readonly actor: string; readonly activity: string }
   | { readonly type: 'activity:finishes'; readonly actor: string; readonly activity: string }
-  | { readonly type: 'activity:fails';    readonly actor: string; readonly activity: string; readonly error: Error };
+  | { readonly type: 'activity:fails';    readonly actor: string; readonly activity: string; readonly error: Error }
+  | { readonly type: 'scene:starts';      readonly name: string }
+  | { readonly type: 'scene:finishes';    readonly name: string; readonly outcome: Outcome }
+  | { readonly type: 'test-run:finishes' };
+
+export type DomainEvent = DomainEventInput & { readonly timestamp: number };
 
 export interface StageCrewMember {
   notifyOf(event: DomainEvent): void;
@@ -54,15 +60,19 @@ export interface StageCrewMember {
 ```
 
 - It's a **discriminated union** on `type`, so a `switch (event.type)` narrows the
-  shape and TypeScript knows `error` only exists on `activity:fails`.
+  shape and TypeScript knows `error` only exists on `activity:fails`, `outcome`
+  only on `scene:finishes`.
 - `actor` is the actor's name; `activity` is the activity's `toString()`
-  description (the `#actor ...` strings you write).
+  description (the `#actor ...` strings you write); `name` is the scene's name.
+- Call sites build the un-stamped `DomainEventInput`; the `Stage` adds the
+  `timestamp` on announce (§3) — crew members only ever see the stamped
+  `DomainEvent`.
 - A `StageCrewMember` is anything with a single `notifyOf(event)` method.
 
-> **Currently activity-level only.** There are no scene/run events yet. Adding
-> `scene:starts` / `scene:finishes` / `test-run:finishes` (so results can be
-> grouped per test and written to an HTML file) is exactly what the
-> [static HTML reporting plan](../planning/static-html-reporting.md) specifies.
+The scene and run events are what lets a reporter group activities per test
+case and know when to render — see [`HtmlReporter`](../src/crew/HtmlReporter.ts)
+and the [static HTML reporting plan](../planning/static-html-reporting.md),
+which this model implements.
 
 ---
 
@@ -78,12 +88,17 @@ assign(...crewMembers: StageCrewMember[]): void {
   this.crew.push(...crewMembers);
 }
 
-announce(event: DomainEvent): void {
+announce(event: DomainEventInput): void {
+  const stamped: DomainEvent = { ...event, timestamp: this.now() };
   for (const member of this.crew) {
-    member.notifyOf(event);
+    member.notifyOf(stamped);
   }
 }
 ```
+
+`announce` is where the un-stamped `DomainEventInput` a call site builds becomes the
+stamped `DomainEvent` a crew member receives — the injectable `now()` clock (defaulting
+to `Date.now`) is what lets tests control timestamps deterministically.
 
 **The `Actor`** announces around every activity it performs
 ([`src/screenplay/Actor.ts`](../src/screenplay/Actor.ts)):
@@ -241,9 +256,11 @@ without changing any screenplay code:
 
 - **Logging / debugging** — `ConsoleReporter` today.
 - **Metrics** — the `TimingReporter` above.
-- **Static HTML reports** — the planned `HtmlReporter` will buffer events,
-  reconstruct the tree (per §6), and render a file on a `test-run:finishes`
-  signal. See [`planning/static-html-reporting.md`](../planning/static-html-reporting.md).
+- **Static HTML reports** — [`HtmlReporter`](../src/crew/HtmlReporter.ts) buffers
+  events, reconstructs the tree (per §6), and renders a file on a
+  `test-run:finishes` signal. See
+  [`planning/static-html-reporting.md`](../planning/static-html-reporting.md)
+  for the design this shipped from.
 
 Because observation is decoupled, you can add any of these by writing a new crew
 member and `assign`-ing it — actors, tasks, interactions, and questions never
@@ -259,7 +276,8 @@ change.
 | `Stage.assign` / `Stage.announce` | [`src/screenplay/Stage.ts`](../src/screenplay/Stage.ts) |
 | Where events are emitted (`attemptsTo`) | [`src/screenplay/Actor.ts`](../src/screenplay/Actor.ts) |
 | Example crew member | [`src/crew/ConsoleReporter.ts`](../src/crew/ConsoleReporter.ts) |
-| Planned reporting on top of this layer | [`planning/static-html-reporting.md`](../planning/static-html-reporting.md) |
+| Shipped `HtmlReporter` | [`src/crew/HtmlReporter.ts`](../src/crew/HtmlReporter.ts) |
+| Reporting design this shipped from | [`planning/static-html-reporting.md`](../planning/static-html-reporting.md) |
 
 ---
 

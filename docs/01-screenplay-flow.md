@@ -342,8 +342,10 @@ finishes #actor ensures that the value does equal {"id":1,"email":"ada@example.c
 ```
 
 This stream is exactly what a `StageCrewMember` (such as the built-in
-`ConsoleReporter`) consumes. It is also the foundation the planned
-[static HTML reporter](../planning/static-html-reporting.md) builds on.
+`ConsoleReporter` or [`HtmlReporter`](../src/crew/HtmlReporter.ts)) consumes —
+see [Guide 03](./03-event-notification-layer.md) for the full event model this
+is built on, including the scene/run events the
+[static HTML reporter](../planning/static-html-reporting.md) shipped from.
 
 ---
 
