@@ -184,9 +184,10 @@ describe('buildReport', () => {
     expect(report.startedAt).toBe(1000);
   });
 
-  it('reports a scene that starts but never finishes as not passed (crash truth)', () => {
+  it('reports a scene that starts but never finishes as not passed (crash truth), and its still-open activity likewise', () => {
     // A crashed run: the scene opens, an activity begins, the run ends —
-    // no scene:finishes ever arrives. The placeholder outcome must not stand.
+    // no scene:finishes ever arrives. The placeholder outcome must not stand,
+    // at either the scene level or the still-open activity's.
     const interrupted: DomainEvent[] = [
       { type: 'scene:starts', name: 'Ada is interrupted mid-scene', timestamp: 100 },
       starts('Ada', '#actor begins a task that never completes', 110),
@@ -195,6 +196,7 @@ describe('buildReport', () => {
 
     const report = buildReport(interrupted);
     const [scene] = report.scenes;
+    const [task] = scene.activities;
 
     expect(report.total).toBe(1);
     expect(report.succeeded).toBe(0);
@@ -206,6 +208,61 @@ describe('buildReport', () => {
     ).toContain('never finished');
     // Duration runs to the end of the fold, floored as everywhere.
     expect(scene.durationMs).toBe(60);
+
+    // The task was still open (only activity:starts, no finishes/fails) when the
+    // fold ended — it must not keep its optimistic successful()/0ms placeholder.
+    expect(Outcome.isSuccessful(task.outcome)).toBe(false);
+    expect(task.outcome).toMatchObject({ status: 'failure', kind: 'error' });
+    expect(
+      task.outcome.status === 'failure' ? task.outcome.error.message : '',
+    ).toContain('never finished');
+    expect(task.durationMs).toBe(50); // 160 - 110, same end-of-fold timestamp as the scene
+  });
+
+  it('interrupts an earlier scene, and any activity still open on it, when a second scene:starts arrives before it finishes', () => {
+    // Overlapping scenes: a mis-wired manual sceneStarts/sceneFinishes facade lets
+    // a second scene:starts arrive while the first is still open. The first must
+    // not be abandoned at its optimistic placeholder and silently counted as passed.
+    const overlapping: DomainEvent[] = [
+      { type: 'scene:starts', name: 'First scene, never finished', timestamp: 100 },
+      starts('Ada', '#actor begins a task that never completes', 110),
+      { type: 'scene:starts', name: 'Second scene', timestamp: 200 },
+      starts('Bob', '#actor performs cleanly', 210),
+      finishes('Bob', '#actor performs cleanly', 220),
+      {
+        type: 'scene:finishes',
+        name: 'Second scene',
+        outcome: Outcome.successful(),
+        timestamp: 230,
+      },
+    ];
+
+    const report = buildReport(overlapping);
+
+    expect(report.total).toBe(2);
+    expect(report.succeeded).toBe(1);
+    expect(report.failed).toBe(1);
+
+    const [firstScene, secondScene] = report.scenes;
+
+    // The first scene is interrupted at the moment the second scene starts (200),
+    // not left open and counted as passed.
+    expect(Outcome.isSuccessful(firstScene.outcome)).toBe(false);
+    expect(firstScene.outcome).toMatchObject({ status: 'failure', kind: 'error' });
+    expect(
+      firstScene.outcome.status === 'failure' ? firstScene.outcome.error.message : '',
+    ).toContain('a new scene');
+    expect(firstScene.durationMs).toBe(100); // 200 - 100
+
+    const [openTask] = firstScene.activities;
+    expect(Outcome.isSuccessful(openTask.outcome)).toBe(false);
+    expect(openTask.durationMs).toBe(90); // 200 - 110
+
+    // The second scene is unaffected by the first's interruption — a fresh
+    // openActivities map means it does not inherit the first scene's open task.
+    expect(Outcome.isSuccessful(secondScene.outcome)).toBe(true);
+    expect(secondScene.activities).toHaveLength(1);
+    expect(Outcome.isSuccessful(secondScene.activities[0].outcome)).toBe(true);
   });
 
   it('floors an interrupted scene duration at zero under a non-monotonic clock', () => {
