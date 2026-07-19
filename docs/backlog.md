@@ -7,12 +7,16 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
-**Version:** 5 — folded in the second review-derived cycle (HBSP-15..22) as Resolved Items #8–#15
-**Last Updated:** 2026-07-07
-**Based on:** repo at commit `8ecd282` (`main`, PRs #19–#25 merged); second review-derived worklist
-HBSP-15..22, derived from code review `.review/CODE_REVIEW_CLAUDE_Fable_5_v1_20260706T1044Z/`.
-Prior: v4 folded in HBSP-09..14 (PRs #15–#17) from review `…Opus_4_8_v1_20260616T1543Z`; Item #1
-traces to the earlier survey at commit `a138aa8` (README, `planning/`, CI workflow, package scripts).
+**Version:** 6 — records Item #16 (TRIAGE-04, `ConsoleReporter` coverage) from the in-progress
+third review-derived cycle (review v2); TRIAGE-01..03 already merged but not yet backlog-recorded
+individually (see `WORKLIST_hand-baked-screenplay-pattern.md`); TRIAGE-05 remains open.
+**Last Updated:** 2026-07-19
+**Based on:** repo on branch `worklist/triage-04-console-reporter-coverage`, off `main` at
+`780916b` (PRs #28–#30 merged: TRIAGE-01..03); third review-derived worklist TRIAGE-01..05,
+derived from code review `.review/CODE_REVIEW_CLAUDE_Fable_5_v2_20260718T0032Z/`.
+Prior: v5 folded in HBSP-15..22 (PRs #19–#25) from review `…Fable_5_v1_20260706T1044Z/`; v4 folded
+in HBSP-09..14 (PRs #15–#17) from review `…Opus_4_8_v1_20260616T1543Z`; Item #1 traces to the
+earlier survey at commit `a138aa8` (README, `planning/`, CI workflow, package scripts).
 
 This backlog tracks outstanding work and risks for the hand-baked Screenplay pattern teaching
 library, ordered by priority score (highest first). It is the project's **source of truth** for
@@ -137,8 +141,10 @@ only filesystem path — was never exercised; there was also no way to see cover
 `spec/html-reporter-fs.spec.ts` driving the real `fileSystemWriter` to `os.tmpdir()` (asserts a
 real `index.html` containing `<!DOCTYPE html>`, exercises nested-dir creation, cleans up); added a
 `coverage` script (`vitest run --coverage` via `@vitest/coverage-v8@^4.1.9`, matching the Vitest 4
-major) surfaced informationally in CI on Node 20 with **no hard gate** (per the review). Coverage =
-**90.16% stmts / 84.49% branch / 94.11% funcs / 90.32% lines**. Test count 48 → 50.
+major) surfaced informationally in CI on Node 20 with **no hard gate** (per the review). Coverage
+**as of 2026-06-17** = 90.16% stmts / 84.49% branch / 94.11% funcs / 90.32% lines. Test count
+48 → 50. See Item #16 below for the current figures — coverage numbers are now restated
+"as of `<date>`" rather than claimed evergreen, since the suite and the code it covers both grow.
 **Affected Stacks:** `spec/` + `package.json` + CI.
 
 #### Item #6: No public-API surface canary; an accidental export change would surface only in the sibling consumer — Score: 5 — ✅ RESOLVED
@@ -262,6 +268,33 @@ committed lockfile and `npm audit` 0 **before** acting; dismissed both via `gh a
 (informational).
 **Affected Stacks:** none (GitHub security tab only).
 
+### Third review-derived cycle (review v2, TRIAGE-01..05) — in progress 2026-07-19
+
+Code review v2 (`.review/CODE_REVIEW_CLAUDE_Fable_5_v2_20260718T0032Z/`) found no HIGH/MEDIUM
+findings — five Low/Low-Medium items, triaged into `WORKLIST_hand-baked-screenplay-pattern.md`
+TRIAGE-01..05 (portfolio root). Recorded here as each lands; the cycle is not yet complete (see
+Potential Next Steps for what remains).
+
+#### Item #16: `ConsoleReporter` had 0% test coverage; Item #5's coverage numbers had drifted — Score: n/a (review Low) — ✅ RESOLVED
+
+**Impact:** `ConsoleReporter.ts` — the library's original, README-advertised crew member — had no
+spec at all despite an injectable `log` sink built for exactly that; the three log formats and the
+intentionally-ignored scene/run event types were unpinned. Separately, Item #5's coverage numbers
+(90.16%/84.49%) no longer reproduced — later cycles (HBSP-16/17, TRIAGE-03) changed the
+denominator without restating them.
+**Status:** ✅ RESOLVED 2026-07-19 (TRIAGE-04). Added `spec/console-reporter.spec.ts`: asserts the
+three formatted log lines (`begins:`/`done:`/`fails:`), that `scene:starts`/`scene:finishes`/
+`test-run:finishes` produce no output (the documented scope boundary), and that the constructor
+defaults its sink to `console.log`. Test count 85 → 88.
+**Coverage as of 2026-07-19** = **92.85% stmts / 82.96% branch / 95.04% funcs / 93.15% lines**
+(`npm run coverage`; `src/crew/` — `ConsoleReporter.ts` and `HtmlReporter.ts` — now both fully
+covered, absent from the report's per-file detail rows). Branch % moved down from 84.49% despite
+the new spec because a growing suite widens the denominator faster than any one file's coverage
+narrows it — a normal effect of the overall codebase growing, not a regression in this file.
+Re-run `npm run coverage` for the live numbers next time this note is touched, rather than trusting
+this one indefinitely.
+**Affected Stacks:** `spec/` + `docs/backlog.md`.
+
 ---
 
 ## Risk Summary
@@ -272,7 +305,7 @@ committed lockfile and `npm audit` 0 **before** acting; dismissed both via `gh a
 | MEDIUM (10–19) | 0 | — | — |
 | LOW (0–9) | 0 | — | — |
 | **Total Outstanding** | **0** | **—** | |
-| Resolved | 15 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07) |
+| Resolved | 16 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Item #16 / TRIAGE-04 (2026-07-19) |
 
 ---
 
@@ -280,10 +313,10 @@ committed lockfile and `npm audit` 0 **before** acting; dismissed both via `gh a
 
 ### HIGH Priority
 
-None. **Static HTML reporting** (Item #1) and both review-derived cycles (Items #2–#7 / HBSP-09..14,
-and Items #8–#15 / HBSP-15..22) are all Resolved. The project is at a natural resting point —
-no open PRs, `npm run verify` green at **84 tests** on `main` `8ecd282`, `npm audit` clean, release
-**0.2.0** cut, 0 open Dependabot alerts.
+None. **Static HTML reporting** (Item #1) and all three review-derived cycles' findings so far
+(Items #2–#7 / HBSP-09..14, Items #8–#15 / HBSP-15..22, Item #16 / TRIAGE-04) are Resolved — no
+HIGH or MEDIUM finding has ever been raised against this project. `npm run verify` green at
+**88 tests** as of this item.
 
 ### MEDIUM Priority
 
@@ -291,10 +324,14 @@ None yet.
 
 ### LOW Priority
 
-None yet.
+**In progress — review v2 close-out (TRIAGE-01..05):** TRIAGE-01 (pedagogical guide refresh),
+TRIAGE-02 (README version pointer), and TRIAGE-03 (activity-level crash truth) are already
+Resolved (see `WORKLIST_hand-baked-screenplay-pattern.md` at the portfolio root for commits/PRs);
+TRIAGE-04 lands with this entry as Item #16. TRIAGE-05 (delete the unused `isPromise` helper)
+remains open.
 
-> A third code review or a fresh survey would be the natural source of the next items — there is
-> no outstanding work to schedule from the current evidence.
+> A fourth code review or a fresh survey would be the natural source of further items once
+> TRIAGE-05 lands and this cycle closes out.
 
 ---
 
