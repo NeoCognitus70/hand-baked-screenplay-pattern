@@ -235,9 +235,9 @@ spec/            Vitest specs, including end-to-end worked examples
 
 ## Versioning & changelog
 
-This project follows [Semantic Versioning](https://semver.org/). The current
-version is **0.1.0**; while the major version is `0`, the public API may change
-between minor versions. All notable changes are recorded in
+This project follows [Semantic Versioning](https://semver.org/); while the major
+version is `0`, the public API may change between minor versions. The current
+version is recorded in [`package.json`](./package.json) and
 [`CHANGELOG.md`](./CHANGELOG.md), formatted per
 [Keep a Changelog](https://keepachangelog.com/).
 
