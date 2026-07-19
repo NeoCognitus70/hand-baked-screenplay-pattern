@@ -1,6 +1,7 @@
 # Implementation Plan: Static HTML Reporting
 
-> **Status:** Ready to implement
+> **Status:** Delivered 2026-06-13 (backlog Item #1) — retained as a worked example
+> of an implementation plan.
 > **Audience:** Any engineer or automated agent picking up this work.
 > **Prerequisite reading:** the root `README.md` and the existing source under
 > `src/screenplay/`, especially `StageEvents.ts`, `Stage.ts`, `Actor.ts`, and
