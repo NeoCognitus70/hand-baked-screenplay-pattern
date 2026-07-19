@@ -7,13 +7,13 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
-**Version:** 6 — records Item #16 (TRIAGE-04, `ConsoleReporter` coverage) from the in-progress
-third review-derived cycle (review v2); TRIAGE-01..03 already merged but not yet backlog-recorded
-individually (see `WORKLIST_hand-baked-screenplay-pattern.md`); TRIAGE-05 remains open.
+**Version:** 7 — closes out the third review-derived cycle (review v2): Items #17–#20 record
+TRIAGE-01, #02, #03, and #05 (Item #16 / TRIAGE-04 landed in v6). Every finding from review v2 now
+has a recorded disposition. No outstanding items remain.
 **Last Updated:** 2026-07-19
-**Based on:** repo on branch `worklist/triage-04-console-reporter-coverage`, off `main` at
-`780916b` (PRs #28–#30 merged: TRIAGE-01..03); third review-derived worklist TRIAGE-01..05,
-derived from code review `.review/CODE_REVIEW_CLAUDE_Fable_5_v2_20260718T0032Z/`.
+**Based on:** repo at commit `519d2d6` (`main`, PRs #28–#32 merged: TRIAGE-01..05); third
+review-derived worklist TRIAGE-01..05, derived from code review
+`.review/CODE_REVIEW_CLAUDE_Fable_5_v2_20260718T0032Z/`.
 Prior: v5 folded in HBSP-15..22 (PRs #19–#25) from review `…Fable_5_v1_20260706T1044Z/`; v4 folded
 in HBSP-09..14 (PRs #15–#17) from review `…Opus_4_8_v1_20260616T1543Z`; Item #1 traces to the
 earlier survey at commit `a138aa8` (README, `planning/`, CI workflow, package scripts).
@@ -268,12 +268,14 @@ committed lockfile and `npm audit` 0 **before** acting; dismissed both via `gh a
 (informational).
 **Affected Stacks:** none (GitHub security tab only).
 
-### Third review-derived cycle (review v2, TRIAGE-01..05) — in progress 2026-07-19
+### Third review-derived cycle (review v2, TRIAGE-01..05) — Resolved 2026-07-19
 
 Code review v2 (`.review/CODE_REVIEW_CLAUDE_Fable_5_v2_20260718T0032Z/`) found no HIGH/MEDIUM
 findings — five Low/Low-Medium items, triaged into `WORKLIST_hand-baked-screenplay-pattern.md`
-TRIAGE-01..05 (portfolio root). Recorded here as each lands; the cycle is not yet complete (see
-Potential Next Steps for what remains).
+TRIAGE-01..05 (portfolio root) and executed one item per `loop-worklist` iteration, each on its
+own branch off fresh `main` with a green PR (#28–#32). TRIAGE-04 landed first in this backlog as
+Item #16; Items #17–#20 below record TRIAGE-01, #02, #03, and #05, reconciled in the same pass
+that closed out the cycle (this session, after all five PRs merged).
 
 #### Item #16: `ConsoleReporter` had 0% test coverage; Item #5's coverage numbers had drifted — Score: n/a (review Low) — ✅ RESOLVED
 
@@ -295,6 +297,60 @@ Re-run `npm run coverage` for the live numbers next time this note is touched, r
 this one indefinitely.
 **Affected Stacks:** `spec/` + `docs/backlog.md`.
 
+#### Item #17: Pedagogical guides still taught the pre-0.2.0 model, and called the shipped `HtmlReporter` "planned" — Score: 9 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (4) + Maintenance Burden (5) = **9 points**
+**Impact:** `docs/03-event-notification-layer.md` presented the `DomainEvent` union as three
+activity-only variants with no `timestamp` and said "There are no scene/run events yet";
+`docs/01-screenplay-flow.md` called the reporter "planned". Both had shipped 2026-07-07 (0.2.0). A
+reader following the guides was told the library's headline feature did not exist, and the guide's
+code snippet no longer compiled against the library it documented.
+**Status:** ✅ RESOLVED 2026-07-19 (TRIAGE-01, commit `9b00eec`, PR #28). Both guides now show the
+real six-variant `DomainEventInput`/`DomainEvent` split and the `Stage.announce` timestamp-stamping
+step, and point at the shipped `HtmlReporter`. `planning/static-html-reporting.md`'s status header
+flipped from "Ready to implement" to "Delivered 2026-06-13 (backlog Item #1) — retained as a
+worked example"; the plan body itself is untouched. Review Risk 1 (LOW-MEDIUM).
+**Affected Stacks:** docs (`docs/03-event-notification-layer.md`, `docs/01-screenplay-flow.md`,
+`planning/static-html-reporting.md`).
+
+#### Item #18: README hardcoded "the current version is 0.1.0" though HBSP-21 had cut 0.2.0 — Score: 4 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (1) + Maintenance Burden (3) = **4 points**
+**Impact:** The Versioning section's one sentence whose only job is to state the version was wrong
+by a full minor release — a small but visible credibility nick, and the exact drift class the
+portfolio's reviews keep flagging.
+**Status:** ✅ RESOLVED 2026-07-19 (TRIAGE-02, commit `e6cfe27`, PR #29). Replaced the literal with
+a pointer to `package.json`/`CHANGELOG.md`, so it cannot rot again. Review Risk 2 (LOW).
+**Affected Stacks:** docs (`README.md`).
+
+#### Item #19: `buildReport` crash truth stopped at scene level — an interrupted activity still rendered as passed — Score: 7 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (4) + Maintenance Burden (3) = **7 points**
+**Impact:** HBSP-16 fixed the false-green *scene*, but an activity still open when its scene closed
+kept its optimistic `successful()`/`0ms` placeholder — a report could show a green tick for the very
+step executing when a run died, nested under a scene the same report marked failed. Separately, the
+crash-truth correction only ever considered a single `currentScene`: a second `scene:starts`
+arriving while an earlier one was still open (the manual `sceneStarts`/`sceneFinishes` facade the
+README documents for runner hooks) left the earlier scene abandoned at its placeholder, silently
+counted as passed.
+**Status:** ✅ RESOLVED 2026-07-19 (TRIAGE-03, commit `bc4ff2d`, PR #30). Added
+`interruptOpenActivities`/`interruptScene` helpers, wired into all three places a scene can close
+(`scene:finishes`, end-of-fold, a superseding `scene:starts`). Extended the crash-truth spec with
+activity-level assertions and added a new spec pinning the overlapping-scenes semantics. Test count
+84 → 85. Review Risk 3 (LOW).
+**Affected Stacks:** `src/reporting/ReportModel.ts` + `spec/`.
+
+#### Item #20: Dead code — `isPromise` in `src/util.ts` had no callers — Score: 3 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (0) + Maintenance Burden (3) = **3 points**
+**Impact:** HBSP-20 removed the redundant promise branch in `Actor.answer` (and its `isPromise`
+import) but left the helper itself behind — pure maintenance noise, no behavioural risk.
+**Status:** ✅ RESOLVED 2026-07-19 (TRIAGE-05, commit `fa18823`, PR #32). Deleted the helper and its
+JSDoc; `grep -rn "isPromise" src spec` confirmed zero callers before removal, `util.ts` is internal
+(not exported from `src/index.ts`), so removal cannot affect the public API or the sibling
+`calculator-screenplay-bdd` consumer. Review Risk 5 (LOW).
+**Affected Stacks:** `src/util.ts`.
+
 ---
 
 ## Risk Summary
@@ -305,7 +361,7 @@ this one indefinitely.
 | MEDIUM (10–19) | 0 | — | — |
 | LOW (0–9) | 0 | — | — |
 | **Total Outstanding** | **0** | **—** | |
-| Resolved | 16 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Item #16 / TRIAGE-04 (2026-07-19) |
+| Resolved | 20 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19) |
 
 ---
 
@@ -313,10 +369,10 @@ this one indefinitely.
 
 ### HIGH Priority
 
-None. **Static HTML reporting** (Item #1) and all three review-derived cycles' findings so far
-(Items #2–#7 / HBSP-09..14, Items #8–#15 / HBSP-15..22, Item #16 / TRIAGE-04) are Resolved — no
-HIGH or MEDIUM finding has ever been raised against this project. `npm run verify` green at
-**88 tests** as of this item.
+None. **Static HTML reporting** (Item #1) and all three review-derived cycles (Items #2–#7 /
+HBSP-09..14, Items #8–#15 / HBSP-15..22, Items #16–#20 / TRIAGE-01..05) are Resolved — no HIGH or
+MEDIUM finding has ever been raised against this project. `npm run verify` green at **88 tests**
+on `main` `519d2d6`, `npm audit` clean, release **0.2.0** current.
 
 ### MEDIUM Priority
 
@@ -324,14 +380,10 @@ None yet.
 
 ### LOW Priority
 
-**In progress — review v2 close-out (TRIAGE-01..05):** TRIAGE-01 (pedagogical guide refresh),
-TRIAGE-02 (README version pointer), and TRIAGE-03 (activity-level crash truth) are already
-Resolved (see `WORKLIST_hand-baked-screenplay-pattern.md` at the portfolio root for commits/PRs);
-TRIAGE-04 lands with this entry as Item #16. TRIAGE-05 (delete the unused `isPromise` helper)
-remains open.
+None yet — the review v2 close-out (TRIAGE-01..05 / Items #16–#20) is fully Resolved.
 
-> A fourth code review or a fresh survey would be the natural source of further items once
-> TRIAGE-05 lands and this cycle closes out.
+> A fourth code review or a fresh survey would be the natural source of the next items — there is
+> no outstanding work to schedule from the current evidence.
 
 ---
 
