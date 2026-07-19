@@ -60,14 +60,3 @@ export function deepEqual(a: unknown, b: unknown): boolean {
     (key) => Object.prototype.hasOwnProperty.call(bRecord, key) && deepEqual(aRecord[key], bRecord[key]),
   );
 }
-
-/**
- * Type guard that recognises thenables (Promises).
- */
-export function isPromise<T>(value: unknown): value is Promise<T> {
-  return (
-    !!value &&
-    (typeof value === 'object' || typeof value === 'function') &&
-    typeof (value as { then?: unknown }).then === 'function'
-  );
-}
