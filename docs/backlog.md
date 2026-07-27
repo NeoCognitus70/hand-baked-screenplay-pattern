@@ -7,18 +7,18 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
-**Version:** 8 — records the **CGX-01** release-truth reconciliation from the fourth review
-(Codex GPT-5 v1, `.review/CODE_REVIEW_CODEX_GPT5_v1_20260723T2337Z/`): the actual `v0.2.0` Git tag
-and GitHub release were created on 2026-07-27 (Item #14 previously recorded only the *version
-metadata* as cut), resolving that review's Risk 1 (MEDIUM). The rest of that review (CGX-02..06 —
-one further MEDIUM plus four LOW/informational items) is tracked in
-`WORKLIST_hand-baked-screenplay-pattern.md` and will be folded in at cycle closeout; those are
-**outstanding**. v7 closed out review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 /
-TRIAGE-04 landed in v6).
+**Version:** 9 — closes out the **fourth** review-derived cycle (Codex GPT-5 v1,
+`.review/CODE_REVIEW_CODEX_GPT5_v1_20260723T2337Z/`): Items #21–#26 record CGX-01..06, all Resolved
+2026-07-27 (v8 had recorded only CGX-01). This review is the first to raise **MEDIUM** findings
+against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no HIGH/MEDIUM ever" and
+"no outstanding items" notes below are updated accordingly. v8 recorded the CGX-01 release-truth
+reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
+review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
 **Last Updated:** 2026-07-27
-**Based on:** repo at commit `519d2d6` (`main`, PRs #28–#32 merged: TRIAGE-01..05); third
-review-derived worklist TRIAGE-01..05, derived from code review
-`.review/CODE_REVIEW_CLAUDE_Fable_5_v2_20260718T0032Z/`.
+**Based on:** repo at commit `2a5e93f` (`main`, PRs #35–#40 merged: CGX-01..06; `npm run verify`
+green at 104 tests, `npm audit` clean, release `v0.2.0` live); fourth review-derived worklist
+CGX-01..06 in `WORKLIST_hand-baked-screenplay-pattern.md`, derived from code review
+`.review/CODE_REVIEW_CODEX_GPT5_v1_20260723T2337Z/`.
 Prior: v5 folded in HBSP-15..22 (PRs #19–#25) from review `…Fable_5_v1_20260706T1044Z/`; v4 folded
 in HBSP-09..14 (PRs #15–#17) from review `…Opus_4_8_v1_20260616T1543Z`; Item #1 traces to the
 earlier survey at commit `a138aa8` (README, `planning/`, CI workflow, package scripts).
@@ -363,6 +363,99 @@ JSDoc; `grep -rn "isPromise" src spec` confirmed zero callers before removal, `u
 `calculator-screenplay-bdd` consumer. Review Risk 5 (LOW).
 **Affected Stacks:** `src/util.ts`.
 
+### Fourth review-derived cycle (Codex GPT-5 v1, CGX-01..06) — Resolved 2026-07-27
+
+The fourth code review (`.review/CODE_REVIEW_CODEX_GPT5_v1_20260723T2337Z/`, identity CODEX_GPT5)
+on 2026-07-23 raised **two MEDIUM** findings (the first MEDIUMs ever against this project) plus one
+LOW-MEDIUM and three LOW, and one informational item. Triaged into
+`WORKLIST_hand-baked-screenplay-pattern.md` as CGX-01..06 and executed one item per `loop-worklist`
+iteration, each on its own branch off `main` with a green PR (#35–#40, all merged 2026-07-27).
+Risk 7 (informational — clean `npm audit`, licence intact) was dropped to routine maintenance per
+the review's own steer; the recorded crew-isolation question was not promoted to a finding.
+
+#### Item #21: Release truth — 0.2.0 was "cut" in metadata but no tag/release existed — Score: 14 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (2) + Breakage Probability (5) + Maintenance Burden (7) = **14 points**
+**Impact:** The backlog declared 0.2.0 cut and current, and `package.json`/`CHANGELOG.md` carried
+0.2.0, but no `v0.2.0` Git tag existed locally or on the remote and GitHub's latest release was
+still `v0.1.0` — the repo had 0.2.0 *source metadata*, not a verifiable release, and the changelog
+`compare/v0.1.0...v0.2.0` link was unresolved.
+**Status:** ✅ RESOLVED 2026-07-27 (CGX-01, docs commit `1bb226b`, PR #35). Created the lightweight
+`v0.2.0` tag at `8ecd282` (the PR #25 merge — the 0.2.0 state, dated 2026-07-07) and published the
+GitHub release from it (now Latest); **no npm publish** (matches the v0.1.0 stance). Corrected the
+Item #14 wording (metadata cut by HBSP-21 vs release made under CGX-01); added a
+`CHANGELOG.md [Unreleased]` note for TRIAGE-03; added `docs/releasing.md` (a release-verification
+checklist). Review Risk 1 (**MEDIUM**). Decision: GitHub tag + release only.
+**Affected Stacks:** ops (Git tag + GitHub release) + docs (`docs/backlog.md`, `CHANGELOG.md`,
+`docs/releasing.md`).
+
+#### Item #22: `Cast.whereEveryoneCan` shares mutable ability instances across actors — Score: 13 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (3) + Breakage Probability (5) + Maintenance Burden (5) = **13 points**
+**Impact:** `whereEveryoneCan(...abilities)` granted the *same* ability instances to every actor, so
+two actors on one stage shared mutable state — `ManageData`'s store and `MakeRequests`'s last
+response leaked across actor identities — despite the actor-centric API implying isolation.
+**Status:** ✅ RESOLVED 2026-07-27 (CGX-02, commit `49010af`, PR #36). Added
+`Cast.whereEachActorCan(() => Ability[])`, which builds fresh instances per prepared actor;
+`whereEveryoneCan` unchanged (decision: keep the default, additive fix), its JSDoc now documents the
+sharing. Two-actor isolation spec covers both `ManageData` and `MakeRequests.lastResponse`; README +
+Guide 01 disclose the sharing. Additive-only — no export changed (public-api canary green), so the
+`calculator-screenplay-bdd` consumer is unaffected. 88 → 91 tests. Review Risk 2 (**MEDIUM**).
+**Affected Stacks:** `src/screenplay/Cast.ts` + `spec/` + README + `docs/01-screenplay-flow.md`.
+
+#### Item #23: Falsy thrown values produced a passing scene — Score: 9 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (5) + Maintenance Burden (4) = **9 points**
+**Impact:** `Outcome.from` treated every falsy value as success (`if (!error)`), and `scene()` fed
+caught values straight in, so `throw false/0/''/null/undefined` rendered as a **passing** scene even
+though `scene()` re-threw them — a false green contradicting the runner.
+**Status:** ✅ RESOLVED 2026-07-27 (CGX-03, commit `b829403`, PR #37). Added the total
+`Outcome.fromError(error: unknown)` (every value → failure, non-`Error` wrapped, `AssertionError`
+preserved); `scene()`'s catch uses it; `Outcome.from` unchanged for the absence-of-error=success
+intent and now delegates to `fromError`. Table-driven `outcome.spec` + an end-to-end assertion that
+`throw false` renders 1 failed / 0 passed. 91 → 99 tests (via this branch's base). Review Risk 3
+(LOW-MEDIUM).
+**Affected Stacks:** `src/screenplay/Outcome.ts` + `src/scene/scene.ts` + `spec/`.
+
+#### Item #24: Scene-level failures rendered no error details — Score: 6 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (3) + Maintenance Burden (3) = **6 points**
+**Impact:** `renderScene` rendered only a status pill, so a scene that failed before/outside
+`attemptsTo` (setup, a hook, orchestration) produced a red scene with no actionable cause — the
+README promised "error details for failures" without that qualification.
+**Status:** ✅ RESOLVED 2026-07-27 (CGX-04, commit `a01b666`, PR #38). Generalised `renderError` to a
+scene/activity `Outcome`; `renderScene` renders the scene's own error block when it failed,
+suppressed only when a nested activity already shows the identical error (no duplicate noise). New
+specs: a no-activities failing scene renders its escaped message + stack; a matching scene/activity
+error renders once. Review Risk 4 (LOW).
+**Affected Stacks:** `src/reporting/renderHtml.ts` + `spec/`.
+
+#### Item #25: A zero-scene run was labelled "All scenes passed" — Score: 5 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (3) + Maintenance Burden (2) = **5 points**
+**Impact:** The renderer defined a passed run solely as `failed === 0`, so an empty or terminal-only
+event stream produced a green "All scenes passed" summary despite recording no test evidence — a
+misconfigured runner that executed nothing looked successful.
+**Status:** ✅ RESOLVED 2026-07-27 (CGX-05, commit `163c721`, PR #39). `RunReport` gains an explicit
+`status: 'passed' | 'failed' | 'empty'` (new `RunStatus` type); `buildReport` sets `'empty'` for a
+zero-scene run; `renderHtml` renders a neutral "No scenes recorded" band (amber, visibly not green).
+Model + reporter + renderer specs cover the terminal-only and empty streams. `RunStatus`/`status`
+are type-only additions (no runtime export change; canary green). → 104 tests. Decision: neutral
+state. Review Risk 5 (LOW).
+**Affected Stacks:** `src/reporting/ReportModel.ts` + `src/reporting/renderHtml.ts` + `spec/`.
+
+#### Item #26: Guide 03 TimingReporter example was unsafe for concurrent actors — Score: 3 — ✅ RESOLVED
+
+**Priority Score:** Security Impact (0) + Breakage Probability (0) + Maintenance Burden (3) = **3 points**
+**Impact:** The teaching `TimingReporter` in `docs/03-event-notification-layer.md` used one global
+LIFO stack popped for any actor and timed with fresh `Date.now()` calls, so interleaved actors
+mispaired start/finish times — contradicting the same guide's §6, which explains a reporter needs a
+stack per actor.
+**Status:** ✅ RESOLVED 2026-07-27 (CGX-06, commit `5db3058`, PR #40). Keyed the start-time stack by
+`event.actor` (`Map<string, number[]>`), timing from the stamped `event.timestamp` not `Date.now()`;
+added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk 6 (LOW).
+**Affected Stacks:** `docs/03-event-notification-layer.md`.
+
 ---
 
 ## Risk Summary
@@ -373,7 +466,7 @@ JSDoc; `grep -rn "isPromise" src spec` confirmed zero callers before removal, `u
 | MEDIUM (10–19) | 0 | — | — |
 | LOW (0–9) | 0 | — | — |
 | **Total Outstanding** | **0** | **—** | |
-| Resolved | 20 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19) |
+| Resolved | 26 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27) |
 
 ---
 
@@ -381,20 +474,23 @@ JSDoc; `grep -rn "isPromise" src spec` confirmed zero callers before removal, `u
 
 ### HIGH Priority
 
-None. **Static HTML reporting** (Item #1) and all three review-derived cycles (Items #2–#7 /
-HBSP-09..14, Items #8–#15 / HBSP-15..22, Items #16–#20 / TRIAGE-01..05) are Resolved — no HIGH or
-MEDIUM finding has ever been raised against this project. `npm run verify` green at **88 tests**
-on `main` `519d2d6`, `npm audit` clean, release **0.2.0** current.
+None. **Static HTML reporting** (Item #1) and all four review-derived cycles (Items #2–#7 /
+HBSP-09..14, Items #8–#15 / HBSP-15..22, Items #16–#20 / TRIAGE-01..05, Items #21–#26 / CGX-01..06)
+are Resolved. The fourth review (Codex GPT-5 v1) raised the project's first **MEDIUM** findings
+(Items #21–#22), both now closed. `npm run verify` green at **104 tests** on `main` `2a5e93f`,
+`npm audit` clean, release **`v0.2.0`** live on GitHub (tag + release, Item #21).
 
 ### MEDIUM Priority
 
-None yet.
+None outstanding — Items #21 (release truth) and #22 (shared abilities), the first MEDIUMs raised
+against the project, are Resolved.
 
 ### LOW Priority
 
-None yet — the review v2 close-out (TRIAGE-01..05 / Items #16–#20) is fully Resolved.
+None yet — the review v2 close-out (TRIAGE-01..05 / Items #16–#20) and the review v3/Codex close-out
+(CGX-01..06 / Items #21–#26) are fully Resolved.
 
-> A fourth code review or a fresh survey would be the natural source of the next items — there is
+> A fifth code review or a fresh survey would be the natural source of the next items — there is
 > no outstanding work to schedule from the current evidence.
 
 ---
