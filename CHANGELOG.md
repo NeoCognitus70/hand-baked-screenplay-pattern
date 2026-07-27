@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **A scene that throws a falsy value is now reported as failed.** `scene(...)`
+  converts a caught throw with the new total `Outcome.fromError(...)`, so
+  `throw 0`, `throw ''`, `throw false`, `throw null`, and `throw undefined` are
+  failures in the HTML report instead of a false green. `Outcome.from(...)` is
+  unchanged (a falsy/absent value still means success) and now delegates to
+  `fromError` for the error case.
+
 ## [0.2.0] - 2026-07-07
 
 Static HTML reporting, a crash-truth reporting fix, npm publish-safety, and a

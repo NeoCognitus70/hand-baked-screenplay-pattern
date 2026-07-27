@@ -79,4 +79,37 @@ describe('Reporting — end-to-end through the public API', () => {
     expect(html).toContain('<section class="scene scene-pass">');
     expect(html).toContain('<section class="scene scene-fail">');
   });
+
+  it('reports a scene that throws a falsy value as failed, not passed', async () => {
+    let captured: { filePath: string; html: string } | undefined;
+    engage(Cast.whereEveryoneCan());
+    assign(
+      HtmlReporter.storingReportsAt('./report').withWriter((filePath, html) => {
+        captured = { filePath, html };
+      }),
+    );
+
+    // `throw false` is caught by scene(), which re-throws the original value.
+    let rethrown: unknown = 'nothing was thrown';
+    try {
+      await scene('Ada trips over a falsy throw', async () => {
+        throw false;
+      });
+    } catch (error) {
+      rethrown = error;
+    }
+    // The original falsy value is still re-thrown so the test would fail.
+    expect(rethrown).toBe(false);
+
+    testRunFinishes();
+
+    expect(captured).toBeDefined();
+    const html = captured!.html;
+    // Before CGX-03 this rendered as a green "All scenes passed"; now the falsy
+    // throw is a genuine failure: 1 scene, 0 passed, 1 failed.
+    expect(html).not.toContain('All scenes passed');
+    expect(html).toContain('class="summary fail"');
+    expect(html).toContain('<b>1</b> scenes — <b>0</b> passed, <b>1</b> failed');
+    expect(html).toContain('<section class="scene scene-fail">');
+  });
 });

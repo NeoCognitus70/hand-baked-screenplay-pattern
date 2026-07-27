@@ -37,6 +37,45 @@ describe('Outcome', () => {
     });
   });
 
+  describe('fromError', () => {
+    it.each([
+      ['false', false],
+      ['0', 0],
+      ["'' (empty string)", ''],
+      ['null', null],
+      ['undefined', undefined],
+    ])('produces a failure for the falsy thrown value %s', (_label, value) => {
+      const outcome = Outcome.fromError(value);
+
+      expect(outcome.status).toBe('failure');
+      if (outcome.status === 'failure') {
+        expect(outcome.kind).toBe('error');
+        expect(outcome.error).toBeInstanceOf(Error);
+        expect(outcome.error.message.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('preserves an AssertionError as a failure of kind "assertion"', () => {
+      const error = new AssertionError('nope');
+
+      expect(Outcome.fromError(error)).toEqual({
+        status: 'failure',
+        kind: 'assertion',
+        error,
+      });
+    });
+
+    it('wraps a thrown non-Error string, preserving its text', () => {
+      const outcome = Outcome.fromError('boom');
+
+      expect(outcome.status).toBe('failure');
+      if (outcome.status === 'failure') {
+        expect(outcome.kind).toBe('error');
+        expect(outcome.error.message).toBe('boom');
+      }
+    });
+  });
+
   it('successful() produces a success that isSuccessful() recognises', () => {
     const outcome = Outcome.successful();
 
