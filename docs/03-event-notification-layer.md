@@ -178,26 +178,33 @@ stage.assign(new ConsoleReporter());
 ## 5. Writing your own crew member
 
 Implement the one-method interface. Here's a timing reporter that measures how
-long each activity takes, using a per-activity stack:
+long each activity takes. It keeps **a start-time stack per actor** (keyed by
+`event.actor`) and uses the event's **stamped `timestamp`** rather than calling
+`Date.now()` — the same two rules the tree reconstruction relies on (see §6):
 
 ```ts
 import type { DomainEvent, StageCrewMember } from 'hand-baked-screenplay-pattern';
 
 export class TimingReporter implements StageCrewMember {
-  private readonly started: number[] = [];
-  readonly timings: { activity: string; ms: number; ok: boolean }[] = [];
+  // One stack of start timestamps per actor, so interleaved actors don't mispair.
+  private readonly started = new Map<string, number[]>();
+  readonly timings: { actor: string; activity: string; ms: number; ok: boolean }[] = [];
 
   notifyOf(event: DomainEvent): void {
     switch (event.type) {
-      case 'activity:starts':
-        this.started.push(Date.now());
+      case 'activity:starts': {
+        const stack = this.started.get(event.actor) ?? [];
+        stack.push(event.timestamp); // the Stage-stamped time, not Date.now()
+        this.started.set(event.actor, stack);
         break;
+      }
       case 'activity:finishes':
       case 'activity:fails': {
-        const start = this.started.pop() ?? Date.now();
+        const start = this.started.get(event.actor)?.pop() ?? event.timestamp;
         this.timings.push({
+          actor: event.actor,
           activity: event.activity,
-          ms: Date.now() - start,
+          ms: event.timestamp - start,
           ok: event.type === 'activity:finishes',
         });
         break;
@@ -206,6 +213,22 @@ export class TimingReporter implements StageCrewMember {
   }
 }
 ```
+
+Why the per-actor key (and the stamped timestamp) matter — imagine Ada and Bob
+performing concurrently, so their events interleave:
+
+```text
+starts    Ada  GET /health     <-- push onto Ada's stack
+starts    Bob  GET /version    <-- push onto Bob's stack
+finishes  Bob  GET /version    <-- pop Bob's stack  → pairs with Bob's start
+finishes  Ada  GET /health     <-- pop Ada's stack  → pairs with Ada's start
+```
+
+A single global stack would pop Bob's finish against **Ada's** start time, timing
+the wrong activity. Keying by `event.actor` keeps each pairing correct — exactly
+the rule §6 uses to rebuild the tree. Using `event.timestamp` (stamped once, on
+announce) instead of a fresh `Date.now()` also keeps the measurement tied to when
+the event actually happened, not to when this reporter got around to handling it.
 
 That's the whole extension point. Anything you can express as "react to a stream
 of start/finish/fail events" — logging, metrics, JSON output, a progress bar —
