@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Crash truth now extends to the activity level.** `buildReport`
+  (`src/reporting/ReportModel.ts`) marks a still-open *activity* as interrupted
+  when its scene closes (on `scene:finishes`, end-of-fold, or a superseding
+  `scene:starts`), not just the enclosing scene, so a report can no longer show a
+  green tick on the step that was executing when a run died.
+
 ## [0.2.0] - 2026-07-07
 
 Static HTML reporting, a crash-truth reporting fix, npm publish-safety, and a
