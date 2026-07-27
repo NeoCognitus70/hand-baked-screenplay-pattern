@@ -34,7 +34,9 @@ export async function scene(
     await body();
     sceneFinishes(name, Outcome.successful());
   } catch (error) {
-    sceneFinishes(name, Outcome.from(error));
+    // A caught throw is always a failure — use fromError, not from, so a falsy
+    // thrown value (throw 0 / '' / false) is not mistaken for a passing scene.
+    sceneFinishes(name, Outcome.fromError(error));
     throw error; // re-throw so the test still fails
   }
 }

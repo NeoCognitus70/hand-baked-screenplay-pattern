@@ -48,7 +48,7 @@ This package targets Node.js 20+ and is shipped as native ES modules.
 | **Task**      | A business-level activity that composes other activities. `Task.where('#actor signs up', ...)`. |
 | **Interaction** | A system-level activity that uses an ability directly. `Interaction.where('#actor clicks', actor => ...)`. |
 | **Question**  | A query about the system's state. `Question.about('the status', actor => ...)`, answered via `actor.answer(...)`. |
-| **Cast**      | Prepares actors with their abilities. `Cast.whereEveryoneCan(...)`. |
+| **Cast**      | Prepares actors with their abilities. `Cast.whereEveryoneCan(...)` shares one ability instance across all actors (stateless abilities); `Cast.whereEachActorCan(() => [...])` builds fresh instances per actor (isolate mutable abilities like `ManageData` / `MakeRequests`). |
 | **Stage**     | Instantiates/caches actors, tracks the one in the spotlight, and announces domain events to its crew. |
 | **Ensure**    | An interaction that asserts a value meets an `Expectation` (`equals`, `isGreaterThan`, `isPresent`, `includes`, ...). |
 

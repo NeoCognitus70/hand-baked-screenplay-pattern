@@ -148,7 +148,14 @@ sequenceDiagram
 
 What just happened:
 1. The **Cast** is a recipe for equipping actors. `whereEveryoneCan(...)` means
-   "give every actor these abilities."
+   "give every actor **these same ability instances**." That is fine here — this
+   scenario has a single actor — and fine in general for *stateless* abilities.
+   But because the instances are shared, two actors on one stage would share
+   mutable state: with `ManageData` they would read each other's remembered
+   values, and with `MakeRequests` they would share the last response. When
+   actors must be isolated, use `Cast.whereEachActorCan(() => [...])`, which
+   builds fresh abilities per actor (a stateless transport such as the HTTP
+   client can still be shared inside the factory). See the `Cast` JSDoc for both.
 2. The **Stage** lazily creates an actor the first time you ask for them by name,
    runs them through the Cast's `prepare(...)`, and caches them (ask for `'Ada'`
    again and you get the same instance).
