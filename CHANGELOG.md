@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Scene-level failure details now render in the HTML report.** `renderHtml`
+  shows a scene's own error block when the scene failed — e.g. a setup, hook, or
+  orchestration failure with no activity to carry the error — instead of a red
+  scene with only a pill. The scene error is suppressed when a nested activity
+  already displays the identical error, so there is no duplicate noise.
+
 ## [0.2.0] - 2026-07-07
 
 Static HTML reporting, a crash-truth reporting fix, npm publish-safety, and a
