@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Cast.whereEachActorCan(() => [...])`**: a cast factory that builds fresh
+  ability instances **per actor**, so mutable abilities (`ManageData`'s store,
+  `MakeRequests`'s last response) are no longer shared between actors on the same
+  stage. `Cast.whereEveryoneCan(...)` is unchanged — its JSDoc now documents that
+  it shares one instance across all actors and is intended for stateless
+  abilities. README and Guide 01 explain when to use each.
+
 ## [0.2.0] - 2026-07-07
 
 Static HTML reporting, a crash-truth reporting fix, npm publish-safety, and a
