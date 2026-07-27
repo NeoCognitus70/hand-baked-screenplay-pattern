@@ -7,8 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Cast.whereEachActorCan(() => [...])`**: a cast factory that builds fresh
+  ability instances **per actor**, so mutable abilities (`ManageData`'s store,
+  `MakeRequests`'s last response) are no longer shared between actors on the same
+  stage. `Cast.whereEveryoneCan(...)` is unchanged — its JSDoc now documents that
+  it shares one instance across all actors and is intended for stateless
+  abilities. README and Guide 01 explain when to use each.
+
 ### Fixed
 
+- **Crash truth now extends to the activity level.** `buildReport`
+  (`src/reporting/ReportModel.ts`) marks a still-open *activity* as interrupted
+  when its scene closes (on `scene:finishes`, end-of-fold, or a superseding
+  `scene:starts`), not just the enclosing scene, so a report can no longer show a
+  green tick on the step that was executing when a run died.
 - **A scene that throws a falsy value is now reported as failed.** `scene(...)`
   converts a caught throw with the new total `Outcome.fromError(...)`, so
   `throw 0`, `throw ''`, `throw false`, `throw null`, and `throw undefined` are

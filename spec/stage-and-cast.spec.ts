@@ -3,6 +3,9 @@ import {
   Cast,
   ConfigurationError,
   Interaction,
+  LogicError,
+  MakeRequests,
+  ManageData,
   Stage,
   actorCalled,
   actorInTheSpotlight,
@@ -16,6 +19,7 @@ import {
   sceneStarts,
   testRunFinishes,
 } from '../src/screenplay/Stage.js';
+import { InMemoryHttpClient } from './support/InMemoryHttpClient.js';
 import { RecordingCrew } from './support/RecordingCrew.js';
 
 describe('Stage and Cast', () => {
@@ -125,6 +129,53 @@ describe('Scene and test-run lifecycle events', () => {
     ]);
     const finish = crew.events[1];
     expect(finish.type === 'scene:finishes' && finish.outcome.status).toBe('failure');
+  });
+});
+
+describe('Actor ability isolation', () => {
+  it('whereEveryoneCan shares one ability instance across actors (documented sharing)', () => {
+    const stage = new Stage(Cast.whereEveryoneCan(ManageData.usingAnEmptyStore()));
+    const ada = stage.actor('Ada');
+    const bob = stage.actor('Bob');
+
+    ada.abilityTo(ManageData).set('token', 'ada-secret');
+
+    // Both actors hold the *same* ManageData instance, so Bob reads Ada's value.
+    expect(bob.abilityTo(ManageData).get('token')).toBe('ada-secret');
+    expect(ada.abilityTo(ManageData)).toBe(bob.abilityTo(ManageData));
+  });
+
+  it('whereEachActorCan gives each actor its own ManageData store', () => {
+    const stage = new Stage(
+      Cast.whereEachActorCan(() => [ManageData.usingAnEmptyStore()]),
+    );
+    const ada = stage.actor('Ada');
+    const bob = stage.actor('Bob');
+
+    ada.abilityTo(ManageData).set('token', 'ada-secret');
+
+    // Fresh instances per actor: Ada's remembered data does not leak to Bob.
+    expect(bob.abilityTo(ManageData).has('token')).toBe(false);
+    expect(ada.abilityTo(ManageData)).not.toBe(bob.abilityTo(ManageData));
+  });
+
+  it('whereEachActorCan isolates MakeRequests.lastResponse per actor', async () => {
+    const client = InMemoryHttpClient.withRoutes({
+      'GET /ping': { status: 200, headers: {}, body: 'pong' },
+    });
+    const stage = new Stage(
+      // A stateless transport (the client) may be shared; the mutable
+      // MakeRequests wrapper that remembers the last response is per-actor.
+      Cast.whereEachActorCan(() => [MakeRequests.using(client)]),
+    );
+    const ada = stage.actor('Ada');
+    const bob = stage.actor('Bob');
+
+    await ada.abilityTo(MakeRequests).send({ method: 'GET', url: '/ping' });
+
+    expect(ada.abilityTo(MakeRequests).mostRecentResponse().status).toBe(200);
+    // Bob never sent a request, so his own MakeRequests has no last response.
+    expect(() => bob.abilityTo(MakeRequests).mostRecentResponse()).toThrow(LogicError);
   });
 });
 
