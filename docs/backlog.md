@@ -7,10 +7,15 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
-**Version:** 7 — closes out the third review-derived cycle (review v2): Items #17–#20 record
-TRIAGE-01, #02, #03, and #05 (Item #16 / TRIAGE-04 landed in v6). Every finding from review v2 now
-has a recorded disposition. No outstanding items remain.
-**Last Updated:** 2026-07-19
+**Version:** 8 — records the **CGX-01** release-truth reconciliation from the fourth review
+(Codex GPT-5 v1, `.review/CODE_REVIEW_CODEX_GPT5_v1_20260723T2337Z/`): the actual `v0.2.0` Git tag
+and GitHub release were created on 2026-07-27 (Item #14 previously recorded only the *version
+metadata* as cut), resolving that review's Risk 1 (MEDIUM). The rest of that review (CGX-02..06 —
+one further MEDIUM plus four LOW/informational items) is tracked in
+`WORKLIST_hand-baked-screenplay-pattern.md` and will be folded in at cycle closeout; those are
+**outstanding**. v7 closed out review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 /
+TRIAGE-04 landed in v6).
+**Last Updated:** 2026-07-27
 **Based on:** repo at commit `519d2d6` (`main`, PRs #28–#32 merged: TRIAGE-01..05); third
 review-derived worklist TRIAGE-01..05, derived from code review
 `.review/CODE_REVIEW_CLAUDE_Fable_5_v2_20260718T0032Z/`.
@@ -182,7 +187,9 @@ A second code review (`.review/CODE_REVIEW_CLAUDE_Fable_5_v1_20260706T1044Z/`, i
 CLAUDE_Fable_5) on 2026-07-06 raised one MEDIUM process risk, two low-medium/low correctness fixes,
 three low hygiene items, and one informational item — **no HIGH findings**. Derived into worklist
 items HBSP-15..22 and delivered across PRs #19–#25 (merged 2026-07-07), plus one ops action.
-All gated green on `npm run verify`. Release **0.2.0** was cut (HBSP-21). Statuses authoritative.
+All gated green on `npm run verify`. Release **0.2.0** metadata was cut (HBSP-21); the actual
+`v0.2.0` tag and GitHub release followed on 2026-07-27 under **CGX-01** (see Item #14). Statuses
+authoritative.
 
 #### Item #8: Backlog v4 reconciliation was uncommitted — committed `main` was a full cycle stale — Score: 12 — ✅ RESOLVED
 
@@ -253,7 +260,12 @@ Review Recommendations (LOW).
 whole feature stream while 0.1.0 was the only release.
 **Status:** ✅ RESOLVED 2026-07-07 (HBSP-21, commit `cdd7b90`, PR #25). Cut `## [0.2.0]` (one
 heading per change type, Keep-a-Changelog order); compare links updated; `package.json` → `0.2.0`.
-Review Risk 6 (LOW).
+Review Risk 6 (LOW). **Release completed 2026-07-27 (CGX-01):** HBSP-21 prepared only the version
+*metadata*; the fourth review (Codex GPT-5 v1) found no `v0.2.0` tag or GitHub release existed
+(its Risk 1, MEDIUM). CGX-01 created the lightweight `v0.2.0` tag at `8ecd282` (the PR #25 merge —
+the 0.2.0 state, dated 2026-07-07) and published the GitHub release from it; no npm publish (matches
+the v0.1.0 precedent). See `docs/releasing.md` for the checklist that keeps release metadata and the
+release record aligned.
 **Affected Stacks:** `CHANGELOG.md` + `package.json`.
 
 #### Item #15: Two stale Dependabot `vite` alerts on the default branch — Score: 2 — ✅ RESOLVED
