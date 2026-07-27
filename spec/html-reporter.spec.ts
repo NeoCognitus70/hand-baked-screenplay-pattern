@@ -90,6 +90,19 @@ describe('HtmlReporter', () => {
     expect(secondHtml).not.toContain('Ada checks the health endpoint');
   });
 
+  it('renders a terminal-only run (no scenes) as neutral, not a green pass', () => {
+    const writer = vi.fn<Parameters<ReportWriter>, void>();
+    const reporter = HtmlReporter.storingReportsAt().withWriter(writer);
+
+    reporter.notifyOf({ type: 'test-run:finishes', timestamp: 1 });
+
+    const html = writer.mock.calls[0][1];
+    expect(html).toContain('class="summary empty"');
+    expect(html).toContain('No scenes recorded');
+    expect(html).not.toContain('All scenes passed');
+    expect(html).not.toContain('class="summary pass"');
+  });
+
   it('reports the run outcome the buffered events describe', () => {
     const writer = vi.fn<Parameters<ReportWriter>, void>();
     const reporter = HtmlReporter.storingReportsAt().withWriter(writer);
