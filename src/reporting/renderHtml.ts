@@ -38,8 +38,11 @@ function statusPill(outcome: SceneReport['outcome']): string {
   return `<span class="pill pill-fail">${label}</span>`;
 }
 
-/** Renders the error block for a failing activity, escaping all dynamic text. */
-function renderError(outcome: ActivityReport['outcome']): string {
+/**
+ * Renders the error block for a failing activity **or scene**, escaping all
+ * dynamic text. Both carry the same {@link Outcome} shape.
+ */
+function renderError(outcome: SceneReport['outcome']): string {
   if (outcome.status === 'success') return '';
   const message = escapeHtml(outcome.error.message);
   // The stack is the most useful detail for an unexpected error; for an
@@ -68,10 +71,35 @@ function renderActivity(activity: ActivityReport): string {
   ].join('');
 }
 
+/** Collects the messages of every failing activity, recursing into children. */
+function collectActivityErrorMessages(
+  activities: ActivityReport[],
+  into: Set<string>,
+): void {
+  for (const activity of activities) {
+    if (activity.outcome.status === 'failure') {
+      into.add(activity.outcome.error.message);
+    }
+    collectActivityErrorMessages(activity.children, into);
+  }
+}
+
 /** Renders one scene section: header, status pill, and its activity tree. */
 function renderScene(scene: SceneReport): string {
   const cls = scene.outcome.status === 'success' ? 'scene-pass' : 'scene-fail';
   const activities = scene.activities.map(renderActivity).join('');
+
+  // Show the scene's *own* error only when a nested activity is not already
+  // displaying it. A scene can fail before/around `attemptsTo` (setup, a hook,
+  // orchestration) with no activity to carry the error; without this the report
+  // would render a red scene with no actionable cause.
+  const activityErrors = new Set<string>();
+  collectActivityErrorMessages(scene.activities, activityErrors);
+  const sceneError =
+    scene.outcome.status === 'failure' && !activityErrors.has(scene.outcome.error.message)
+      ? renderError(scene.outcome)
+      : '';
+
   return [
     `<section class="scene ${cls}">`,
     '<header class="scene-header">',
@@ -80,6 +108,7 @@ function renderScene(scene: SceneReport): string {
     statusPill(scene.outcome),
     `<span class="duration">${formatDuration(scene.durationMs)}</span>`,
     '</header>',
+    sceneError,
     `<ul class="activities scene-body">${activities}</ul>`,
     '</section>',
   ].join('');

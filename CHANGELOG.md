@@ -29,6 +29,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   failures in the HTML report instead of a false green. `Outcome.from(...)` is
   unchanged (a falsy/absent value still means success) and now delegates to
   `fromError` for the error case.
+- **Scene-level failure details now render in the HTML report.** `renderHtml`
+  shows a scene's own error block when the scene failed — e.g. a setup, hook, or
+  orchestration failure with no activity to carry the error — instead of a red
+  scene with only a pill. The scene error is suppressed when a nested activity
+  already displays the identical error, so there is no duplicate noise.
 
 ## [0.2.0] - 2026-07-07
 

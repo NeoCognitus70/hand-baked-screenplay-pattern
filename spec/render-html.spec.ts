@@ -123,6 +123,60 @@ describe('renderHtml', () => {
     expect(html).toContain('&#39;');
   });
 
+  it('renders a scene-level failure that has no activities to carry the error', () => {
+    // A scene that dies in setup/a hook/orchestration fails with an Error but
+    // has no activity — the scene's own error block must still render.
+    const error = new Error('beforeAll hook <exploded> & died');
+    error.stack = 'Error: beforeAll hook\n    at hook.ts:7:1';
+    const html = renderHtml(
+      report({
+        total: 1,
+        succeeded: 0,
+        failed: 1,
+        scenes: [
+          scene({
+            name: 'A scene that dies in setup',
+            outcome: Outcome.from(error),
+            activities: [],
+          }),
+        ],
+      }),
+    );
+
+    expect(html).toContain('<section class="scene scene-fail">');
+    // The message renders, HTML-escaped (raw form must not appear).
+    expect(html).toContain('beforeAll hook &lt;exploded&gt; &amp; died');
+    expect(html).not.toContain('beforeAll hook <exploded> & died');
+    // The stack renders for an unexpected error.
+    expect(html).toContain('error-stack');
+    expect(html).toContain('hook.ts:7:1');
+  });
+
+  it('does not duplicate a scene error already shown on a nested activity', () => {
+    const error = new Error('unique-shared-message-xyz');
+    const html = renderHtml(
+      report({
+        total: 1,
+        succeeded: 0,
+        failed: 1,
+        scenes: [
+          scene({
+            outcome: Outcome.from(error),
+            activities: [activity({ outcome: Outcome.from(error) })],
+          }),
+        ],
+      }),
+    );
+
+    // The error-message block is shown once (on the failing activity), not
+    // repeated at scene level. Count the message *div* specifically — the raw
+    // string also appears inside the default Error stack.
+    const messageBlocks = html.split(
+      'class="error-message">unique-shared-message-xyz</div>',
+    ).length - 1;
+    expect(messageBlocks).toBe(1);
+  });
+
   it('escapes special characters in error messages too', () => {
     const html = renderHtml(
       report({
