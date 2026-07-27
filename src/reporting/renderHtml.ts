@@ -123,6 +123,7 @@ const STYLE = `
              border-left: 6px solid; }
   .summary.pass { background: #e8f5e9; border-color: #2e7d32; color: #1b3d1c; }
   .summary.fail { background: #fdecea; border-color: #c62828; color: #4a1414; }
+  .summary.empty { background: #fff8e1; border-color: #f9a825; color: #4a3b0a; }
   .summary h1 { margin: 0 0 .25rem; font-size: 1.4rem; }
   .summary .counts { font-variant-numeric: tabular-nums; }
   .summary .counts b { font-weight: 700; }
@@ -180,10 +181,15 @@ const SCRIPT = `
  * messages and stacks) is HTML-escaped, so user-controlled content cannot
  * break the markup or inject script (plan §6.5 / §10).
  */
+const SUMMARY: Record<RunReport['status'], { class: string; headline: string }> = {
+  passed: { class: 'pass', headline: 'All scenes passed' },
+  failed: { class: 'fail', headline: 'Some scenes failed' },
+  // A zero-scene run is a distinct neutral state — not a green pass.
+  empty: { class: 'empty', headline: 'No scenes recorded' },
+};
+
 export function renderHtml(report: RunReport): string {
-  const passed = report.failed === 0;
-  const summaryClass = passed ? 'pass' : 'fail';
-  const headline = passed ? 'All scenes passed' : 'Some scenes failed';
+  const { class: summaryClass, headline } = SUMMARY[report.status];
   const scenes = report.scenes.map(renderScene).join('');
 
   return `<!DOCTYPE html>

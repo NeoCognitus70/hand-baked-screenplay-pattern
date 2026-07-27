@@ -285,7 +285,18 @@ describe('buildReport', () => {
       total: 0,
       succeeded: 0,
       failed: 0,
+      status: 'empty',
       scenes: [],
     });
+  });
+
+  it('reports a terminal-only run (no scenes) as the neutral "empty" status', () => {
+    const report = buildReport([{ type: 'test-run:finishes', timestamp: 500 }]);
+
+    expect(report.total).toBe(0);
+    // Neither passed nor failed: no scene evidence was recorded.
+    expect(report.status).toBe('empty');
+    expect(report.failed).toBe(0);
+    expect(report.finishedAt).toBe(500);
   });
 });

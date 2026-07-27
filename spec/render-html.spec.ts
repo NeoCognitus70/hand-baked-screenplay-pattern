@@ -22,16 +22,24 @@ const scene = (over: Partial<SceneReport> = {}): SceneReport => ({
   ...over,
 });
 
-const report = (over: Partial<RunReport> = {}): RunReport => ({
-  startedAt: 100,
-  finishedAt: 300,
-  durationMs: 200,
-  total: 1,
-  succeeded: 1,
-  failed: 0,
-  scenes: [],
-  ...over,
-});
+const report = (over: Partial<RunReport> = {}): RunReport => {
+  const base: RunReport = {
+    startedAt: 100,
+    finishedAt: 300,
+    durationMs: 200,
+    total: 1,
+    succeeded: 1,
+    failed: 0,
+    status: 'passed',
+    scenes: [],
+    ...over,
+  };
+  // Derive status from the counts unless the caller pinned it explicitly, so
+  // existing count-based fixtures keep rendering the right summary band.
+  return over.status
+    ? base
+    : { ...base, status: base.total === 0 ? 'empty' : base.failed > 0 ? 'failed' : 'passed' };
+};
 
 describe('renderHtml', () => {
   it('returns a complete standalone HTML document with no external assets', () => {
@@ -62,6 +70,18 @@ describe('renderHtml', () => {
     const html = renderHtml(report({ total: 2, succeeded: 2, failed: 0 }));
     expect(html).toContain('class="summary pass"');
     expect(html).toContain('All scenes passed');
+  });
+
+  it('renders a zero-scene run as a neutral "No scenes recorded" state, not a pass', () => {
+    const html = renderHtml(
+      report({ total: 0, succeeded: 0, failed: 0, scenes: [] }),
+    );
+
+    expect(html).toContain('class="summary empty"');
+    expect(html).toContain('No scenes recorded');
+    // Must not read as a green pass.
+    expect(html).not.toContain('All scenes passed');
+    expect(html).not.toContain('class="summary pass"');
   });
 
   it('renders each scene name and a status pill', () => {

@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stage. `Cast.whereEveryoneCan(...)` is unchanged — its JSDoc now documents that
   it shares one instance across all actors and is intended for stateless
   abilities. README and Guide 01 explain when to use each.
+- **`RunReport.status`** (`'passed' | 'failed' | 'empty'`, the new `RunStatus`
+  type): an explicit overall run status, so a zero-scene run is a distinct
+  neutral state rather than being inferred from the counts.
 
 ### Fixed
 
@@ -34,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   orchestration failure with no activity to carry the error — instead of a red
   scene with only a pill. The scene error is suppressed when a nested activity
   already displays the identical error, so there is no duplicate noise.
+- **A zero-scene run is no longer labelled "All scenes passed".** A terminal-only
+  or empty event stream now renders a neutral "No scenes recorded" summary
+  (`status: 'empty'`), so a misconfigured runner that executes nothing cannot
+  produce a green report.
 
 ## [0.2.0] - 2026-07-07
 

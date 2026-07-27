@@ -26,6 +26,16 @@ export interface SceneReport {
 }
 
 /**
+ * The overall status of a run:
+ * - `passed` — at least one scene, none failed;
+ * - `failed` — at least one scene failed;
+ * - `empty` — no scenes were recorded at all (a terminal-only or empty event
+ *   stream). This is a distinct **neutral** state, not a pass — a misconfigured
+ *   runner that executes nothing must not produce a green report.
+ */
+export type RunStatus = 'passed' | 'failed' | 'empty';
+
+/**
  * The whole test run: summary counts plus every scene.
  */
 export interface RunReport {
@@ -35,6 +45,7 @@ export interface RunReport {
   total: number;
   succeeded: number;
   failed: number;
+  status: RunStatus;
   scenes: SceneReport[];
 }
 
@@ -198,6 +209,9 @@ export function buildReport(events: DomainEvent[]): RunReport {
   const finishedAt =
     runFinishedAt ?? (events.length > 0 ? events[events.length - 1].timestamp : 0);
   const succeeded = scenes.filter((scene) => Outcome.isSuccessful(scene.outcome)).length;
+  const failed = scenes.length - succeeded;
+  // A run with no scenes is neither pass nor fail — it recorded no evidence.
+  const status: RunStatus = scenes.length === 0 ? 'empty' : failed > 0 ? 'failed' : 'passed';
 
   return {
     startedAt,
@@ -205,7 +219,8 @@ export function buildReport(events: DomainEvent[]): RunReport {
     durationMs: Math.max(0, finishedAt - startedAt),
     total: scenes.length,
     succeeded,
-    failed: scenes.length - succeeded,
+    failed,
+    status,
     scenes,
   };
 }
