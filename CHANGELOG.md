@@ -23,6 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when its scene closes (on `scene:finishes`, end-of-fold, or a superseding
   `scene:starts`), not just the enclosing scene, so a report can no longer show a
   green tick on the step that was executing when a run died.
+- **A scene that throws a falsy value is now reported as failed.** `scene(...)`
+  converts a caught throw with the new total `Outcome.fromError(...)`, so
+  `throw 0`, `throw ''`, `throw false`, `throw null`, and `throw undefined` are
+  failures in the HTML report instead of a false green. `Outcome.from(...)` is
+  unchanged (a falsy/absent value still means success) and now delegates to
+  `fromError` for the error case.
 
 ## [0.2.0] - 2026-07-07
 
