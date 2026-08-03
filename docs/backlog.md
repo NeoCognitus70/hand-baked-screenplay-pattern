@@ -7,6 +7,11 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 10 — opens **HBSP-27** (planning-only): publish a deterministic, self-contained sample
+of the existing static HTML reporter to GitHub Pages, to be linked from the portfolio landing page
+as its public evidence slice **LAND-09B**. This is the one currently-open item; the fourth
+review-derived cycle below remains closed.
+
 **Version:** 9 — closes out the **fourth** review-derived cycle (Codex GPT-5 v1,
 `.review/CODE_REVIEW_CODEX_GPT5_v1_20260723T2337Z/`): Items #21–#26 record CGX-01..06, all Resolved
 2026-07-27 (v8 had recorded only CGX-01). This review is the first to raise **MEDIUM** findings
@@ -40,8 +45,63 @@ item status — session handovers narrate; this file records.
 Items are ordered by priority score (highest first). The suite is gated by `npm run verify`
 (typecheck + build + vitest) on PRs and pushes to `main` via the CI workflow.
 
-None outstanding — **Static HTML reporting** (formerly Item #1) was delivered and moved to
-Resolved Risks below.
+#### HBSP-27: Publish a deterministic sample of the static HTML reporter to GitHub Pages — Score: 9 — PLANNING (approved scope)
+
+**Priority Score:** Security Impact (1) + Breakage Probability (3) + Maintenance Burden (5) = **9 points**
+**Origin:** Portfolio landing **LAND-09B** (second public-evidence slice, promoted by owner decision
+2026-08-02 and made READY once LAND-09A closed 2026-08-03). Per the LAND-09 cross-repository delivery
+contract, this landing item does **not** by itself authorise implementation here — this backlog entry
+is that authorisation. The landing repository owns only the eventual link; this repository owns the
+artefact, its generation, tests, workflow and Pages configuration.
+
+**Objective:** Publish one maintained, illustrative, self-contained HTML page produced by the
+project's existing dependency-free `HtmlReporter` / `renderHtml` so a visitor can see the reporter's
+output without cloning or running anything. It demonstrates the reporter capability; it is **not** a
+current CI result and **not** Serenity/JS output.
+
+**Approved scope / decisions (do not re-litigate):**
+- **Deterministic sample, in `src/`.** A pure `renderSampleReport(): string` builder drives a small
+  fixed cast through a dedicated `Stage` with an **injected monotonic `now()`** (not the default
+  stage's `Date.now()`), so timestamps, durations and therefore the whole document are **byte-stable**
+  for unchanged input. It reuses the public `buildReport`/`renderHtml`; it does not fork the renderer.
+- **Meaningful pass/fail content.** At least one passing scene with a nested task → child interactions
+  and an assertion, and at least one deliberately failing scene (assertion failure), so the page shows
+  a red summary, a failed scene and an error message — a genuine demonstration, not an empty run.
+- **Truthful provenance banner.** The page prominently identifies itself as an *illustrative
+  hand-baked reporter sample*, states it is **independent of Serenity/JS**, and does **not** imply
+  current CI status. Added by the sample builder around the core report; the library's generic
+  `renderHtml` output is unchanged for real users.
+- **Self-contained.** One HTML document, inline CSS/JS only, **no external assets or network
+  requests** (the reporter already guarantees this; the check re-asserts it).
+- **Gated by `npm run verify`.** A `spec/` test proves byte-stability (render twice → identical),
+  the required scene/activity content, the provenance wording and the absence of external asset
+  references — so the sample is validated by the existing gate, not a bolt-on script.
+- **Publish only after checks pass on `main`.** A separate `pages.yml` workflow runs on `push` to
+  `main`, runs `npm ci` + `npm run verify` (library + reporter + sample checks) and then generates
+  the report and deploys it. Praise-worthy least privilege: `pages: write` / `id-token: write` live
+  on the deploy job only; pull-request runs stay read-only and deploy nothing. A failed run must not
+  replace the last good public page.
+- **No new runtime dependencies.** The generator script runs on plain Node against built `dist/`
+  (no `tsx`/ts-node added); the sample module is typechecked, built and tested like the rest of `src/`.
+
+**Acceptance criteria (for the implementation PR, not this planning PR):**
+- [ ] Pure `renderSampleReport()` in `src/`, byte-stable, exercised by a `spec/` test that also
+      asserts the provenance banner, the "independent of Serenity/JS" statement, the expected scene
+      names, at least one pass and one fail, and no external `http(s)://`/`src=`/`href=` asset refs.
+- [ ] A generator script writes the self-contained document to `report/index.html` from built `dist/`.
+- [ ] `pages.yml` deploys that page on `push` to `main` after `npm run verify` passes, with deploy-only
+      Pages permissions and no deployment on pull requests.
+- [ ] Repository Pages configured for GitHub Actions publication; the canonical public URL documented
+      in README with the snapshot/illustrative wording and the Serenity/JS independence statement.
+- [ ] The public URL returns HTTP 200, is self-contained and renders with no console errors at desktop
+      and 390px; a separate landing PR then adds the truthful `report` action and records the evidence.
+
+**Type:** code + CI + docs. **This PR is docs-only (planning).**
+
+---
+
+None outstanding besides HBSP-27 above — **Static HTML reporting** (formerly Item #1) was delivered
+and moved to Resolved Risks below.
 
 ---
 
@@ -464,8 +524,8 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
 | MEDIUM (10–19) | 0 | — | — |
-| LOW (0–9) | 0 | — | — |
-| **Total Outstanding** | **0** | **—** | |
+| LOW (0–9) | 1 | ~2–4 hrs | HBSP-27 (sample-report Pages publication) — PLANNING/approved |
+| **Total Outstanding** | **1** | **~2–4 hrs** | |
 | Resolved | 26 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27) |
 
 ---
