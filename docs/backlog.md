@@ -7,10 +7,14 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
-**Version:** 10 — opens **HBSP-27** (planning-only): publish a deterministic, self-contained sample
+**Version:** 11 — **HBSP-27 COMPLETE** (2026-08-04): the deterministic static-reporter sample is live
+at <https://neocognitus70.github.io/hand-baked-screenplay-pattern/> (PRs #42 `be03329` + #43
+`ae33a66`, Pages run 30863382627) and linked from the portfolio landing page, closing landing
+**LAND-09B**. Back to **0 outstanding**; the fourth review-derived cycle below remains closed.
+
+**Version:** 10 — opened **HBSP-27** (planning-only): publish a deterministic, self-contained sample
 of the existing static HTML reporter to GitHub Pages, to be linked from the portfolio landing page
-as its public evidence slice **LAND-09B**. This is the one currently-open item; the fourth
-review-derived cycle below remains closed.
+as its public evidence slice **LAND-09B**.
 
 **Version:** 9 — closes out the **fourth** review-derived cycle (Codex GPT-5 v1,
 `.review/CODE_REVIEW_CODEX_GPT5_v1_20260723T2337Z/`): Items #21–#26 record CGX-01..06, all Resolved
@@ -45,7 +49,7 @@ item status — session handovers narrate; this file records.
 Items are ordered by priority score (highest first). The suite is gated by `npm run verify`
 (typecheck + build + vitest) on PRs and pushes to `main` via the CI workflow.
 
-#### HBSP-27: Publish a deterministic sample of the static HTML reporter to GitHub Pages — Score: 9 — IMPLEMENTED (awaiting merge + Pages deploy)
+#### HBSP-27: Publish a deterministic sample of the static HTML reporter to GitHub Pages — Score: 9 — ✅ COMPLETE 2026-08-04
 
 **Priority Score:** Security Impact (1) + Breakage Probability (3) + Maintenance Burden (5) = **9 points**
 **Origin:** Portfolio landing **LAND-09B** (second public-evidence slice, promoted by owner decision
@@ -97,22 +101,26 @@ current CI result and **not** Serenity/JS output.
       Pages permissions and no deployment on pull requests. **`.github/workflows/pages.yml`: `build`
       runs verify + generate + upload; `deploy` job alone holds `pages: write`/`id-token: write`;
       triggers are `push`/`workflow_dispatch` only.**
-- [~] Repository Pages configured for GitHub Actions publication; the canonical public URL documented
+- [x] Repository Pages configured for GitHub Actions publication; the canonical public URL documented
       in README with the snapshot/illustrative wording and the Serenity/JS independence statement.
-      **README documents <https://neocognitus70.github.io/hand-baked-screenplay-pattern/> with the
-      illustrative/independent wording; repository Pages "GitHub Actions" source is enabled at
-      merge/first deploy.**
-- [ ] The public URL returns HTTP 200, is self-contained and renders with no console errors at desktop
+      **Pages enabled (source = GitHub Actions); README documents
+      <https://neocognitus70.github.io/hand-baked-screenplay-pattern/> with the illustrative/independent
+      wording.**
+- [x] The public URL returns HTTP 200, is self-contained and renders with no console errors at desktop
       and 390px; a separate landing PR then adds the truthful `report` action and records the evidence.
-      **Pending merge + Pages deploy. Rendered locally: banner + 3 scenes (2 pass / 1 fail, assertion
-      error shown), self-contained, no console errors.**
+      **Verified 2026-08-04:** PRs #42 (`be03329`) + #43 (`ae33a66`) merged; Pages
+      [run 30863382627](https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/actions/runs/30863382627)
+      green; the public URL returns HTTP 200 serving the banner + three scenes (2 pass / 1 fail),
+      self-contained with no console errors. The landing "Sample report" action was added and verified
+      live via portfolio landing PR [#23](https://github.com/GBrooks1970/portfolio/pull/23) (`d94787b`),
+      closing landing **LAND-09B**.
 
-**Type:** code + CI + docs. **Implemented on branch `hbsp-27-impl-sample-report`.**
+**Type:** code + CI + docs. **✅ COMPLETE 2026-08-04.**
 
 ---
 
-None outstanding besides HBSP-27 above — **Static HTML reporting** (formerly Item #1) was delivered
-and moved to Resolved Risks below.
+None outstanding — HBSP-27 above is ✅ COMPLETE (2026-08-04), and **Static HTML reporting** (formerly
+Item #1) was delivered and moved to Resolved Risks below.
 
 ---
 
@@ -535,9 +543,9 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
 | MEDIUM (10–19) | 0 | — | — |
-| LOW (0–9) | 1 | ~2–4 hrs | HBSP-27 (sample-report Pages publication) — PLANNING/approved |
-| **Total Outstanding** | **1** | **~2–4 hrs** | |
-| Resolved | 26 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27) |
+| LOW (0–9) | 0 | — | — |
+| **Total Outstanding** | **0** | **—** | |
+| Resolved | 27 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04) |
 
 ---
 
