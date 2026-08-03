@@ -45,7 +45,7 @@ item status — session handovers narrate; this file records.
 Items are ordered by priority score (highest first). The suite is gated by `npm run verify`
 (typecheck + build + vitest) on PRs and pushes to `main` via the CI workflow.
 
-#### HBSP-27: Publish a deterministic sample of the static HTML reporter to GitHub Pages — Score: 9 — PLANNING (approved scope)
+#### HBSP-27: Publish a deterministic sample of the static HTML reporter to GitHub Pages — Score: 9 — IMPLEMENTED (awaiting merge + Pages deploy)
 
 **Priority Score:** Security Impact (1) + Breakage Probability (3) + Maintenance Burden (5) = **9 points**
 **Origin:** Portfolio landing **LAND-09B** (second public-evidence slice, promoted by owner decision
@@ -84,19 +84,30 @@ current CI result and **not** Serenity/JS output.
 - **No new runtime dependencies.** The generator script runs on plain Node against built `dist/`
   (no `tsx`/ts-node added); the sample module is typechecked, built and tested like the rest of `src/`.
 
-**Acceptance criteria (for the implementation PR, not this planning PR):**
-- [ ] Pure `renderSampleReport()` in `src/`, byte-stable, exercised by a `spec/` test that also
+**Acceptance criteria:**
+- [x] Pure `renderSampleReport()` in `src/`, byte-stable, exercised by a `spec/` test that also
       asserts the provenance banner, the "independent of Serenity/JS" statement, the expected scene
       names, at least one pass and one fail, and no external `http(s)://`/`src=`/`href=` asset refs.
-- [ ] A generator script writes the self-contained document to `report/index.html` from built `dist/`.
-- [ ] `pages.yml` deploys that page on `push` to `main` after `npm run verify` passes, with deploy-only
-      Pages permissions and no deployment on pull requests.
-- [ ] Repository Pages configured for GitHub Actions publication; the canonical public URL documented
+      **`src/sample/sampleReport.ts` (not in the public barrel) + `spec/sample-report.spec.ts`;
+      `npm run verify` green at 109 tests. Locally byte-identical across regenerations.**
+- [x] A generator script writes the self-contained document to `report/index.html` from built `dist/`.
+      **`scripts/generate-sample-report.mjs` (plain Node, no new dep) + `npm run report:sample`;
+      wrote 6504 bytes, 0 external refs. `report/` is gitignored (produced in CI).**
+- [x] `pages.yml` deploys that page on `push` to `main` after `npm run verify` passes, with deploy-only
+      Pages permissions and no deployment on pull requests. **`.github/workflows/pages.yml`: `build`
+      runs verify + generate + upload; `deploy` job alone holds `pages: write`/`id-token: write`;
+      triggers are `push`/`workflow_dispatch` only.**
+- [~] Repository Pages configured for GitHub Actions publication; the canonical public URL documented
       in README with the snapshot/illustrative wording and the Serenity/JS independence statement.
+      **README documents <https://neocognitus70.github.io/hand-baked-screenplay-pattern/> with the
+      illustrative/independent wording; repository Pages "GitHub Actions" source is enabled at
+      merge/first deploy.**
 - [ ] The public URL returns HTTP 200, is self-contained and renders with no console errors at desktop
       and 390px; a separate landing PR then adds the truthful `report` action and records the evidence.
+      **Pending merge + Pages deploy. Rendered locally: banner + 3 scenes (2 pass / 1 fail, assertion
+      error shown), self-contained, no console errors.**
 
-**Type:** code + CI + docs. **This PR is docs-only (planning).**
+**Type:** code + CI + docs. **Implemented on branch `hbsp-27-impl-sample-report`.**
 
 ---
 

@@ -3,3 +3,6 @@ dist/
 coverage/
 *.log
 .DS_Store
+
+# Generated sample report (HBSP-27) — produced in CI for Pages, never committed
+report/
