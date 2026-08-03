@@ -210,6 +210,21 @@ A few notes:
   can capture the HTML without touching disk.
 - Reporting is a `StageCrewMember` that observes events — not an actor `Ability`.
 
+### Live sample report
+
+A published example of this reporter's output is at
+**<https://neocognitus70.github.io/hand-baked-screenplay-pattern/>**.
+
+It is an **illustrative sample generated from fixed sample data** — not a live or
+current CI result, and independent of Serenity/JS. It is produced deterministically
+by `renderSampleReport()` (`src/sample/sampleReport.ts`), which drives a small cast
+through a dedicated `Stage` with an injected monotonic clock so the output is
+byte-stable. `npm run report:sample` builds the library and writes
+`report/index.html`; the `Pages` workflow publishes that file on pushes to `main`
+after `npm run verify` passes (the sample's byte-stability, content and
+self-containment are checked in `spec/sample-report.spec.ts`). The sample module is
+not part of the public API.
+
 ## Project layout
 
 ```

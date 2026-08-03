@@ -30,6 +30,7 @@
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "verify": "npm run typecheck && npm run build && npm test",
+    "report:sample": "npm run build && node scripts/generate-sample-report.mjs",
     "test:watch": "vitest",
     "prepublishOnly": "npm run verify"
   },

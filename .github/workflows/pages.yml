@@ -1,0 +1,66 @@
+name: Pages
+
+# Publishes the deterministic sample report (HBSP-27 / portfolio landing
+# LAND-09B) to GitHub Pages. It runs only on push to `main` (and manual
+# dispatch), never on pull requests, so no pull request can deploy. Publication
+# happens only after `npm run verify` passes (library + reporter + the sample's
+# byte-stability / content / self-containment checks); a failed run leaves the
+# last good page in place.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Read-only by default. Only the deploy job is granted Pages write / id-token.
+permissions:
+  contents: read
+
+# Never cancel an in-flight deployment; let it finish so the public page is not
+# left half-updated.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build sample report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify (typecheck + build + tests, incl. sample checks)
+        run: npm run verify
+
+      - name: Generate the sample report
+        run: npm run report:sample
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: report
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
