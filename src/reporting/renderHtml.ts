@@ -115,10 +115,15 @@ function renderScene(scene: SceneReport): string {
 }
 
 const STYLE = `
-  :root { color-scheme: light dark; }
+  /* The report is a light-themed document with hardcoded light surfaces, so it
+     pins the light colour scheme and sets explicit text/background. Without this,
+     an OS dark preference makes inherited text default to white on those light
+     surfaces (e.g. scene names on the light scene header) — invisible. */
+  :root { color-scheme: light; }
   * { box-sizing: border-box; }
   body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-         margin: 0; padding: 1.5rem; line-height: 1.5; }
+         margin: 0; padding: 1.5rem; line-height: 1.5;
+         background: #ffffff; color: #1c2430; }
   .summary { border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem;
              border-left: 6px solid; }
   .summary.pass { background: #e8f5e9; border-color: #2e7d32; color: #1b3d1c; }
