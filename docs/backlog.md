@@ -7,10 +7,17 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 12 — **provider-first iteration promoted** (2026-08-16): Phase 0 (record the provider
+boundary) and Phase 1 (harden the provider) from the portfolio provider-switching viability assessment
+are authorised as **HBSP-28..33**. There are now **6 outstanding MEDIUM items**, executed in dependency
+order. The Calculator pilot and later portfolio migrations remain outside this backlog until separately
+promoted in their owning projects.
+
 **Version:** 11 — **HBSP-27 COMPLETE** (2026-08-04): the deterministic static-reporter sample is live
 at <https://neocognitus70.github.io/hand-baked-screenplay-pattern/> (PRs #42 `be03329` + #43
 `ae33a66`, Pages run 30863382627) and linked from the portfolio landing page, closing landing
-**LAND-09B**. Back to **0 outstanding**; the fourth review-derived cycle below remains closed.
+**LAND-09B**. Back to **0 outstanding** at that point; the fourth review-derived cycle below remains
+closed.
 
 **Version:** 10 — opened **HBSP-27** (planning-only): publish a deterministic, self-contained sample
 of the existing static HTML reporter to GitHub Pages, to be linked from the portfolio landing page
@@ -23,8 +30,11 @@ against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no 
 "no outstanding items" notes below are updated accordingly. v8 recorded the CGX-01 release-truth
 reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
 review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
-**Last Updated:** 2026-07-27
-**Based on:** repo at commit `2a5e93f` (`main`, PRs #35–#40 merged: CGX-01..06; `npm run verify`
+**Last Updated:** 2026-08-16
+**Based on:** repo at commit `7008565` (`main`, clean and aligned with `origin/main`; latest default-
+branch CI green), the owner-approved provider-first promotion, and the portfolio assessment
+`project-specs/potential-project-outlines/hand-baked-screenplay-pattern-provider-switching-viability.md`.
+Prior implementation baseline: commit `2a5e93f` (PRs #35–#40 merged: CGX-01..06; `npm run verify`
 green at 104 tests, `npm audit` clean, release `v0.2.0` live); fourth review-derived worklist
 CGX-01..06 in `WORKLIST_hand-baked-screenplay-pattern.md`, derived from code review
 `.review/CODE_REVIEW_CODEX_GPT5_v1_20260723T2337Z/`.
@@ -48,6 +58,153 @@ item status — session handovers narrate; this file records.
 
 Items are ordered by priority score (highest first). The suite is gated by `npm run verify`
 (typecheck + build + vitest) on PRs and pushes to `main` via the CI workflow.
+
+### Provider-first iteration (HBSP-28..33) — Promoted 2026-08-16
+
+**Delivery rule:** execute **HBSP-28 → HBSP-29 → HBSP-30 → HBSP-31 → HBSP-32 → HBSP-33**. The
+sequence is dependency-driven as well as score-ordered: first record the boundary and compatibility
+baseline, then add portable seams, prove their semantics, and only then package the result. Keep each
+item independently reviewable and leave the current API operational throughout.
+
+**Scope boundary:** this cycle owns only provider Phases 0–1. It does not authorise Calculator changes,
+consumer migrations, a Cypress runtime adapter, a Python/C# bridge, a Serenity replacement, scenario-
+level runtime switching, or report feature parity. Those are separate project decisions after this
+provider baseline is complete.
+
+#### HBSP-28: Record the provider-selection boundary and non-goals in an ADR — Score: 18
+
+**Priority Score:** Security Impact (0) + Breakage Probability (9) + Maintenance Burden (9) = **18 points**
+
+**Origin:** Provider-switching viability assessment, recommended delivery sequence Phase 0 steps 1–2;
+owner promoted the provider-first sequence on 2026-08-16.
+
+**Objective:** create an accepted architectural decision that defines switching at build/profile-time,
+with one provider owning an Actor and all Activities in an execution lane. Preserve the dependency-free,
+Promise-native core and make the iteration's exclusions explicit before any public contract changes.
+
+**Acceptance criteria:**
+- [ ] Add a numbered ADR under `docs/adr/` with status, context, decision, consequences and revisit
+      triggers; link it from the relevant documentation index.
+- [ ] State that native runtime objects from different providers must not be mixed in one Actor or
+      scenario, and that scenario-level hot switching is not supported.
+- [ ] State that identical Serenity-grade reporting, universal execution effects, Cypress-to-Promise
+      conversion, and JavaScript bridges for Python/C# are non-goals.
+- [ ] Preserve zero runtime dependencies in the core; framework integrations belong in companion
+      adapters or consumer-owned composition modules.
+- [ ] `npm run verify` remains green. **Type:** architecture/docs.
+
+#### HBSP-29: Freeze the Calculator-consumed API as the compatibility baseline — Score: 17
+
+**Priority Score:** Security Impact (0) + Breakage Probability (9) + Maintenance Burden (8) = **17 points**
+
+**Origin:** Provider-switching viability assessment, recommended delivery sequence Phase 0 step 3.
+
+**Objective:** turn the current sibling consumer's runtime and type imports into an explicit,
+machine-verifiable compatibility contract before adding provider-neutral abstractions.
+
+**Acceptance criteria:**
+- [ ] Record the Calculator-consumed runtime baseline: `Ability`, `Cast`, `Ensure`, `Interaction`,
+      `LastResponse`, `MakeRequests`, `ManageData`, `Question`, `Recall`, `Remember`, `Send`, `Stage`,
+      `Task`, `equals`, and `includes`.
+- [ ] Record and compile-check its type baseline: `Actor`, `Answerable`, `HttpClient`, `HttpRequest`,
+      and `HttpResponse`, including the current Ability-subclass and HTTP-client adapter shapes.
+- [ ] Extend the public-API canary so removal, rename, or an incompatible type-shape change fails this
+      repository's gate; additive exports remain allowed.
+- [ ] Document the compatibility and deprecation policy for the provider iteration and cross-reference
+      the boundary ADR.
+- [ ] `npm run verify` remains green. **Type:** code + test + docs.
+
+#### HBSP-30: Add additive portable Question and ability-token contracts — Score: 16
+
+**Priority Score:** Security Impact (0) + Breakage Probability (8) + Maintenance Burden (8) = **16 points**
+
+**Origin:** Provider-switching viability assessment, recommended delivery sequence Phase 1 step 1.
+
+**Objective:** allow adapters to resolve structurally compatible Questions and existing abilities
+without requiring `instanceof Question` or inheritance from the concrete `Ability` base class, while
+retaining both current classes and their behaviour.
+
+**Acceptance criteria:**
+- [ ] Export a documented structural `QuestionLike<T>` protocol (or an explicitly portable equivalent)
+      that supports synchronous and asynchronous answers without weakening existing `Question` use.
+- [ ] Export explicit, typed ability tokens/bindings that can register and retrieve an existing object;
+      missing abilities continue to fail with a clear configuration error.
+- [ ] Existing `Question`, `Ability`, `Actor.answer`, and `Actor.abilityTo` call sites remain compatible
+      with the HBSP-29 baseline; no consumer rewrite is required.
+- [ ] Focused tests prove class-based and structural Questions, class-based and token-bound abilities,
+      type inference, isolation, and missing-ability failure.
+- [ ] The core retains zero runtime dependencies and `npm run verify` remains green.
+      **Type:** code + test + docs.
+
+#### HBSP-31: Add an extensible outcome and event envelope without breaking existing events — Score: 15
+
+**Priority Score:** Security Impact (0) + Breakage Probability (8) + Maintenance Burden (7) = **15 points**
+
+**Origin:** Provider-switching viability assessment, recommended delivery sequence Phase 1 step 2.
+
+**Objective:** let providers preserve framework-specific outcomes and metadata while the current Stage,
+crew and reporters continue to receive the existing lifecycle events unchanged.
+
+**Acceptance criteria:**
+- [ ] Define an additive extension envelope for provider-specific outcome/event data; do not flatten
+      distinctions such as environment-blocked versus product failure into a generic error.
+- [ ] Retain the existing `StageEvent` names, required fields, event ordering and current reporter
+      behaviour as the compatibility path.
+- [ ] Tests prove scene start, finish and failure outcomes are emitted once, descriptions survive into
+      observable events, extension data is preserved, and existing reporters ignore unknown extensions
+      safely.
+- [ ] Document ownership: one runner/provider emits lifecycle events for a scenario; adapters must not
+      create a competing Stage lifecycle.
+- [ ] The core retains zero runtime dependencies and `npm run verify` remains green.
+      **Type:** code + test + docs.
+
+#### HBSP-32: Add a reusable cross-provider conformance kit — Score: 14
+
+**Priority Score:** Security Impact (0) + Breakage Probability (7) + Maintenance Burden (7) = **14 points**
+
+**Origin:** Provider-switching viability assessment, recommended delivery sequence Phase 1 step 3.
+
+**Objective:** make provider semantics executable before adding consumers, without forcing every
+provider to expose identical runtime classes or reporting features.
+
+**Acceptance criteria:**
+- [ ] Define a small provider test-harness contract and reusable cases that can run against the
+      hand-baked async provider and an independent minimal fixture implementation.
+- [ ] Prove ability isolation and clear missing-ability failure; ordered activity execution and stop-on-
+      failure; synchronous and asynchronous question resolution; actor/scenario memory isolation;
+      description preservation; and exactly-once lifecycle start/finish/failure semantics.
+- [ ] Include a provider-specific outcome case showing that extension information survives without
+      becoming part of the minimum portable semantics.
+- [ ] Document how a TypeScript provider consumes the kit and keep framework/runner dependencies out of
+      the core runtime package.
+- [ ] A deliberately non-conforming fixture demonstrates that the kit detects contract drift;
+      `npm run verify` remains green. **Type:** code + test + docs.
+
+#### HBSP-33: Produce immutable versioned distribution with verified ESM and CommonJS entry points — Score: 13
+
+**Priority Score:** Security Impact (3) + Breakage Probability (5) + Maintenance Burden (5) = **13 points**
+
+**Origin:** Provider-switching viability assessment, recommended delivery sequence Phase 1 step 4.
+
+**Objective:** replace moving-branch/sibling-only consumption as the proof baseline with a reproducible,
+versioned provider artefact that works in native ESM and CommonJS-hosted consumers.
+
+**Acceptance criteria:**
+- [ ] Add conditional `exports` with verified `types`, `import`, and `require` entry points while
+      preserving the package-root imports frozen by HBSP-29.
+- [ ] Add clean-room pack/install smoke fixtures that load the packed artefact through both ESM
+      `import` and CommonJS `require`, and exercise representative runtime and type exports.
+- [ ] Document and automate one canonical immutable channel: a versioned `npm pack` artefact attached
+      to the matching GitHub release with a SHA-256 checksum. npm-registry publication is not required
+      for this iteration.
+- [ ] Cut the next appropriate version only after HBSP-28..32 pass; document compatibility and release
+      steps in `CHANGELOG.md` and `docs/releasing.md`.
+- [ ] The published package contains only intended files, retains zero runtime dependencies, and passes
+      `npm run verify` plus both pack-install smoke paths. **Type:** packaging + CI + test + docs.
+
+---
+
+### Most recently completed promoted item
 
 #### HBSP-27: Publish a deterministic sample of the static HTML reporter to GitHub Pages — Score: 9 — ✅ COMPLETE 2026-08-04
 
@@ -116,11 +273,6 @@ current CI result and **not** Serenity/JS output.
       closing landing **LAND-09B**.
 
 **Type:** code + CI + docs. **✅ COMPLETE 2026-08-04.**
-
----
-
-None outstanding — HBSP-27 above is ✅ COMPLETE (2026-08-04), and **Static HTML reporting** (formerly
-Item #1) was delivered and moved to Resolved Risks below.
 
 ---
 
@@ -542,9 +694,9 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 | Priority | Count | Total Effort | Status Distribution |
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
-| MEDIUM (10–19) | 0 | — | — |
+| MEDIUM (10–19) | 6 | 2S + 4M | HBSP-28..33 open; dependency-ordered |
 | LOW (0–9) | 0 | — | — |
-| **Total Outstanding** | **0** | **—** | |
+| **Total Outstanding** | **6** | **2S + 4M** | **Provider-first Phases 0–1 promoted** |
 | Resolved | 27 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04) |
 
 ---
@@ -556,21 +708,26 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 None. **Static HTML reporting** (Item #1) and all four review-derived cycles (Items #2–#7 /
 HBSP-09..14, Items #8–#15 / HBSP-15..22, Items #16–#20 / TRIAGE-01..05, Items #21–#26 / CGX-01..06)
 are Resolved. The fourth review (Codex GPT-5 v1) raised the project's first **MEDIUM** findings
-(Items #21–#22), both now closed. `npm run verify` green at **104 tests** on `main` `2a5e93f`,
-`npm audit` clean, release **`v0.2.0`** live on GitHub (tag + release, Item #21).
+(Items #21–#22), both now closed. No provider-first item scores HIGH; execute the promoted MEDIUM
+sequence below before opening later portfolio phases.
 
 ### MEDIUM Priority
 
-None outstanding — Items #21 (release truth) and #22 (shared abilities), the first MEDIUMs raised
-against the project, are Resolved.
+1. **HBSP-28:** record the provider boundary and non-goals.
+2. **HBSP-29:** freeze the Calculator-consumed compatibility baseline.
+3. **HBSP-30:** add portable Question and ability-token contracts.
+4. **HBSP-31:** add the extensible outcome/event envelope.
+5. **HBSP-32:** add and prove the cross-provider conformance kit.
+6. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
+
+Do not start Calculator Phase 2 from this backlog. Complete and reconcile HBSP-28..33 first, then
+promote the consumer-side pilot in `calculator-screenplay-bdd` by explicit owner decision.
 
 ### LOW Priority
 
-None yet — the review v2 close-out (TRIAGE-01..05 / Items #16–#20) and the review v3/Codex close-out
-(CGX-01..06 / Items #21–#26) are fully Resolved.
-
-> A fifth code review or a fresh survey would be the natural source of the next items — there is
-> no outstanding work to schedule from the current evidence.
+None. Optional Serenity parity, Cypress integration, cross-language vectors and consumer migrations
+remain deliberately unpromoted; the portfolio viability assessment is evidence, not authorisation
+outside HBSP-28..33.
 
 ---
 
