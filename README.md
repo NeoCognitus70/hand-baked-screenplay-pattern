@@ -256,6 +256,11 @@ version is recorded in [`package.json`](./package.json) and
 [`CHANGELOG.md`](./CHANGELOG.md), formatted per
 [Keep a Changelog](https://keepachangelog.com/).
 
+During the provider-first iteration, the package-root API used by the sibling
+Calculator project follows the stricter additive-change and deprecation policy
+in the [Calculator compatibility baseline](./docs/compatibility.md). This keeps
+the live consumer operational while provider-neutral seams are introduced.
+
 The package publishes its compiled `dist/` (built from source, git-ignored), so
 a `prepublishOnly` hook runs `npm run verify` (typecheck + build + tests) before
 any `npm publish` — the tarball can never ship a missing or stale build.

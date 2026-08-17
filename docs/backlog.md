@@ -7,6 +7,12 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 14 — **HBSP-29 COMPLETE** (2026-08-17): the package-root runtime names and type shapes
+used by Calculator `main` at `2b10090` are frozen in the
+[`Calculator compatibility baseline`](./compatibility.md) and enforced by runtime plus compile-time
+canaries. The provider iteration follows an additive-change and explicit deprecation policy. There
+are now **4 outstanding MEDIUM items**, HBSP-30..33, in dependency order.
+
 **Version:** 13 — **HBSP-28 COMPLETE** (2026-08-17): accepted
 [`ADR 0001`](./adr/0001-provider-selection-boundary.md), establishing build/profile-time provider
 selection, one provider and lifecycle owner per execution lane, explicit non-goals, and the
@@ -37,8 +43,9 @@ against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no 
 reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
 review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
 **Last Updated:** 2026-08-17
-**Based on:** implementation baseline `6c9c911` (`main`, clean and aligned with `origin/main`), the
-owner-approved provider-first promotion, accepted ADR 0001, and the portfolio assessment
+**Based on:** implementation baseline `b199c6e` (`main`, clean and aligned with `origin/main`), the
+owner-approved provider-first promotion, accepted ADR 0001, the HBSP-29 Calculator compatibility
+baseline, and the portfolio assessment
 `project-specs/potential-project-outlines/hand-baked-screenplay-pattern-provider-switching-viability.md`.
 Prior implementation baseline: commit `2a5e93f` (PRs #35–#40 merged: CGX-01..06; `npm run verify`
 green at 104 tests, `npm audit` clean, release `v0.2.0` live); fourth review-derived worklist
@@ -100,10 +107,10 @@ Promise-native core and make the iteration's exclusions explicit before any publ
 - [x] `npm run verify` remains green. **Type:** architecture/docs.
 
 **Status:** ✅ COMPLETE 2026-08-17. [`ADR 0001`](./adr/0001-provider-selection-boundary.md) records
-the accepted boundary and is indexed from `docs/README.md`; the project gate remains green at 109
-tests. HBSP-29 is now the first actionable item.
+the accepted boundary and is indexed from `docs/README.md`; the project gate remained green at 109
+tests. HBSP-29 followed as the next dependency-ordered item.
 
-#### HBSP-29: Freeze the Calculator-consumed API as the compatibility baseline — Score: 17
+#### HBSP-29: Freeze the Calculator-consumed API as the compatibility baseline — Score: 17 — ✅ COMPLETE 2026-08-17
 
 **Priority Score:** Security Impact (0) + Breakage Probability (9) + Maintenance Burden (8) = **17 points**
 
@@ -113,16 +120,21 @@ tests. HBSP-29 is now the first actionable item.
 machine-verifiable compatibility contract before adding provider-neutral abstractions.
 
 **Acceptance criteria:**
-- [ ] Record the Calculator-consumed runtime baseline: `Ability`, `Cast`, `Ensure`, `Interaction`,
+- [x] Record the Calculator-consumed runtime baseline: `Ability`, `Cast`, `Ensure`, `Interaction`,
       `LastResponse`, `MakeRequests`, `ManageData`, `Question`, `Recall`, `Remember`, `Send`, `Stage`,
       `Task`, `equals`, and `includes`.
-- [ ] Record and compile-check its type baseline: `Actor`, `Answerable`, `HttpClient`, `HttpRequest`,
+- [x] Record and compile-check its type baseline: `Actor`, `Answerable`, `HttpClient`, `HttpRequest`,
       and `HttpResponse`, including the current Ability-subclass and HTTP-client adapter shapes.
-- [ ] Extend the public-API canary so removal, rename, or an incompatible type-shape change fails this
+- [x] Extend the public-API canary so removal, rename, or an incompatible type-shape change fails this
       repository's gate; additive exports remain allowed.
-- [ ] Document the compatibility and deprecation policy for the provider iteration and cross-reference
+- [x] Document the compatibility and deprecation policy for the provider iteration and cross-reference
       the boundary ADR.
-- [ ] `npm run verify` remains green. **Type:** code + test + docs.
+- [x] `npm run verify` remains green. **Type:** code + test + docs.
+
+**Status:** ✅ COMPLETE 2026-08-17. [`docs/compatibility.md`](./compatibility.md) records the exact
+runtime and type baseline plus policy; `spec/public-api.spec.ts` and
+`spec/public-api.types.spec.ts` enforce it. `npm run verify` is green at 15 files / 111 tests.
+HBSP-30 is now the first actionable item.
 
 #### HBSP-30: Add additive portable Question and ability-token contracts — Score: 16
 
@@ -214,7 +226,7 @@ versioned provider artefact that works in native ESM and CommonJS-hosted consume
 
 ---
 
-### Most recently completed promoted item
+### Earlier completed promoted item
 
 #### HBSP-27: Publish a deterministic sample of the static HTML reporter to GitHub Pages — Score: 9 — ✅ COMPLETE 2026-08-04
 
@@ -704,10 +716,10 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 | Priority | Count | Total Effort | Status Distribution |
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
-| MEDIUM (10–19) | 5 | 1S + 4M | HBSP-29..33 open; dependency-ordered |
+| MEDIUM (10–19) | 4 | 4M | HBSP-30..33 open; dependency-ordered |
 | LOW (0–9) | 0 | — | — |
-| **Total Outstanding** | **5** | **1S + 4M** | **HBSP-29..33 remain in the provider-first sequence** |
-| Resolved | 28 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28 (2026-08-17) |
+| **Total Outstanding** | **4** | **4M** | **HBSP-30..33 remain in the provider-first sequence** |
+| Resolved | 29 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..29 (2026-08-17) |
 
 ---
 
@@ -723,11 +735,10 @@ sequence below before opening later portfolio phases.
 
 ### MEDIUM Priority
 
-1. **HBSP-29:** freeze the Calculator-consumed compatibility baseline.
-2. **HBSP-30:** add portable Question and ability-token contracts.
-3. **HBSP-31:** add the extensible outcome/event envelope.
-4. **HBSP-32:** add and prove the cross-provider conformance kit.
-5. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
+1. **HBSP-30:** add portable Question and ability-token contracts.
+2. **HBSP-31:** add the extensible outcome/event envelope.
+3. **HBSP-32:** add and prove the cross-provider conformance kit.
+4. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
 
 Do not start Calculator Phase 2 from this backlog. Complete and reconcile HBSP-28..33 first, then
 promote the consumer-side pilot in `calculator-screenplay-bdd` by explicit owner decision.

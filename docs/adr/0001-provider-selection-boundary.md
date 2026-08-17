@@ -93,6 +93,6 @@ supersede it with evidence and migration impact.
 ## Related records
 
 - [Backlog HBSP-28](../backlog.md)
-- HBSP-29 will freeze the Calculator-consumed compatibility baseline against
-  this boundary.
+- [HBSP-29 compatibility baseline](../compatibility.md) freezes the
+  Calculator-consumed surface against this boundary.
 - HBSP-32 will provide the executable cross-provider conformance evidence.
