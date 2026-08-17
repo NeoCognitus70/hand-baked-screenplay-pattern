@@ -1,8 +1,8 @@
 # Calculator Compatibility Baseline
 
-**Status:** Frozen for the HBSP-28..33 provider-first iteration  
-**Established:** 2026-08-17 under HBSP-29  
-**Consumer evidence:** `calculator-screenplay-bdd` `main` at `2b10090`
+- **Status:** Frozen for the HBSP-28..33 provider-first iteration
+- **Established:** 2026-08-17 under HBSP-29
+- **Consumer evidence:** `calculator-screenplay-bdd` `main` at `2b10090`
 
 This baseline protects the package-root API used by the sibling Calculator
 consumer before portable provider contracts are added. It applies within the
