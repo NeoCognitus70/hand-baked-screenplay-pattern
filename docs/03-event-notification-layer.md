@@ -44,13 +44,17 @@ The events span **activity, scene, and run level**, and every event a crew
 member receives is stamped with a `timestamp` by the `Stage`:
 
 ```ts
-export type DomainEventInput =
+type DomainEventDetails =
   | { readonly type: 'activity:starts';   readonly actor: string; readonly activity: string }
   | { readonly type: 'activity:finishes'; readonly actor: string; readonly activity: string }
   | { readonly type: 'activity:fails';    readonly actor: string; readonly activity: string; readonly error: Error }
   | { readonly type: 'scene:starts';      readonly name: string }
   | { readonly type: 'scene:finishes';    readonly name: string; readonly outcome: Outcome }
   | { readonly type: 'test-run:finishes' };
+
+export type DomainEventInput = DomainEventDetails & {
+  readonly extension?: ExecutionExtension;
+};
 
 export type DomainEvent = DomainEventInput & { readonly timestamp: number };
 
@@ -67,12 +71,65 @@ export interface StageCrewMember {
 - Call sites build the un-stamped `DomainEventInput`; the `Stage` adds the
   `timestamp` on announce (§3) — crew members only ever see the stamped
   `DomainEvent`.
+- `extension` is an optional, provider-owned envelope (§2.1). Existing event
+  names and required fields are unchanged.
 - A `StageCrewMember` is anything with a single `notifyOf(event)` method.
 
 The scene and run events are what lets a reporter group activities per test
 case and know when to render — see [`HtmlReporter`](../src/crew/HtmlReporter.ts)
 and the [static HTML reporting plan](../planning/static-html-reporting.md),
 which this model implements.
+
+### 2.1 Provider extensions without flattened outcomes
+
+Adapters sometimes need to retain a native runner outcome or metadata that the
+small canonical `Outcome` union does not model. `ExecutionExtension` carries
+that data without teaching the core how every provider represents execution:
+
+```ts
+type RunnerOutcome =
+  | { status: 'blocked'; cause: 'environment'; reason: string }
+  | { status: 'failed'; cause: 'product'; defectId: string };
+
+interface RunnerMetadata {
+  scenarioId: string;
+  tags: readonly string[];
+}
+
+const native: ExecutionExtension<RunnerOutcome, RunnerMetadata> = {
+  provider: 'example-runner',
+  outcome: {
+    status: 'blocked',
+    cause: 'environment',
+    reason: 'database unavailable',
+  },
+  metadata: { scenarioId: 'scenario-42', tags: ['@api'] },
+};
+
+stage.sceneFinishes(
+  'The environment is available',
+  Outcome.from(new Error('database unavailable')), // canonical compatibility path
+  native,                                           // lossless provider data
+);
+```
+
+The `provider` identifies the owner of the data; `outcome` and `metadata` remain
+generic so an adapter retains its discriminated native types. The `Stage`
+preserves the envelope when it adds the timestamp. Built-in reporters continue
+to read only canonical fields and safely ignore extensions they do not know.
+Provider-specific crew members can inspect `event.extension` and narrow it for
+their provider.
+
+The lifecycle methods `sceneStarts`, `sceneFinishes`, and `testRunFinishes`
+accept an optional extension. `Stage.announce(...)` accepts it on activity
+events too. Omitting it produces the exact existing event shapes and behaviour.
+
+**One scenario, one lifecycle owner.** Under
+[ADR 0001](./adr/0001-provider-selection-boundary.md), the selected runner or
+provider owns scene start, finish, and failure signalling for its execution
+lane. An adapter must enrich that owner's events; it must not emit a second,
+competing `Stage` lifecycle around the same scenario. This prevents duplicate
+starts/finishes and conflicting outcomes.
 
 ---
 

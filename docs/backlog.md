@@ -7,6 +7,12 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 16 — **HBSP-31 COMPLETE** (2026-08-17): every canonical domain event can now carry a
+typed, provider-owned `ExecutionExtension` that preserves native outcomes and metadata without
+changing existing event names, required fields, order, or reporter behaviour. Lifecycle and reporter
+coverage is green; the full gate passes at 17 files / 123 tests. There are now **2 outstanding MEDIUM
+items**, HBSP-32..33, in dependency order.
+
 **Version:** 15 — **HBSP-30 COMPLETE** (2026-08-17): exported structural `QuestionLike<T>`
 resolution and identity-based typed ability tokens/bindings, preserving the class-based API frozen
 under HBSP-29. Focused tests cover sync/async inference, class/token lookup, isolation and clear
@@ -49,7 +55,7 @@ against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no 
 reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
 review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
 **Last Updated:** 2026-08-17
-**Based on:** implementation baseline `1665bae` (`main`, clean and aligned with `origin/main`), the
+**Based on:** implementation baseline `f707bf9` (`main`, clean and aligned with `origin/main`), the
 owner-approved provider-first promotion, accepted ADR 0001, the HBSP-29 Calculator compatibility
 baseline, and the portfolio assessment
 `project-specs/potential-project-outlines/hand-baked-screenplay-pattern-provider-switching-viability.md`.
@@ -172,7 +178,7 @@ missing-binding diagnostics. [`Guide 04`](./04-portable-questions-and-abilities.
 composition and the ADR boundary. `npm run verify` is green at 16 files / 120 tests. HBSP-31 is now
 the first actionable item.
 
-#### HBSP-31: Add an extensible outcome and event envelope without breaking existing events — Score: 15
+#### HBSP-31: Add an extensible outcome and event envelope without breaking existing events — Score: 15 — ✅ COMPLETE 2026-08-17
 
 **Priority Score:** Security Impact (0) + Breakage Probability (8) + Maintenance Burden (7) = **15 points**
 
@@ -182,17 +188,25 @@ the first actionable item.
 crew and reporters continue to receive the existing lifecycle events unchanged.
 
 **Acceptance criteria:**
-- [ ] Define an additive extension envelope for provider-specific outcome/event data; do not flatten
+- [x] Define an additive extension envelope for provider-specific outcome/event data; do not flatten
       distinctions such as environment-blocked versus product failure into a generic error.
-- [ ] Retain the existing `StageEvent` names, required fields, event ordering and current reporter
+- [x] Retain the existing `StageEvent` names, required fields, event ordering and current reporter
       behaviour as the compatibility path.
-- [ ] Tests prove scene start, finish and failure outcomes are emitted once, descriptions survive into
+- [x] Tests prove scene start, finish and failure outcomes are emitted once, descriptions survive into
       observable events, extension data is preserved, and existing reporters ignore unknown extensions
       safely.
-- [ ] Document ownership: one runner/provider emits lifecycle events for a scenario; adapters must not
+- [x] Document ownership: one runner/provider emits lifecycle events for a scenario; adapters must not
       create a competing Stage lifecycle.
-- [ ] The core retains zero runtime dependencies and `npm run verify` remains green.
+- [x] The core retains zero runtime dependencies and `npm run verify` remains green.
       **Type:** code + test + docs.
+
+**Status:** ✅ COMPLETE 2026-08-17. `ExecutionExtension<ProviderOutcome, ProviderMetadata>` is an
+optional envelope on every `DomainEventInput` / `DomainEvent`; the Stage lifecycle facade accepts it
+without changing existing call sites. `spec/event-extensions.spec.ts` proves native blocked/product
+outcomes and metadata survive unchanged, descriptions and ordering remain intact, successful and
+failed scenes emit exactly one start/finish pair, and existing console/HTML reporters safely ignore
+the extension. Guide 03 documents single-owner lifecycle composition. `npm run verify` is green at
+17 files / 123 tests. HBSP-32 is now the first actionable item.
 
 #### HBSP-32: Add a reusable cross-provider conformance kit — Score: 14
 
@@ -730,10 +744,10 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 | Priority | Count | Total Effort | Status Distribution |
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
-| MEDIUM (10–19) | 3 | 3M | HBSP-31..33 open; dependency-ordered |
+| MEDIUM (10–19) | 2 | 2M | HBSP-32..33 open; dependency-ordered |
 | LOW (0–9) | 0 | — | — |
-| **Total Outstanding** | **3** | **3M** | **HBSP-31..33 remain in the provider-first sequence** |
-| Resolved | 30 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..30 (2026-08-17) |
+| **Total Outstanding** | **2** | **2M** | **HBSP-32..33 remain in the provider-first sequence** |
+| Resolved | 31 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..31 (2026-08-17) |
 
 ---
 
@@ -749,9 +763,8 @@ sequence below before opening later portfolio phases.
 
 ### MEDIUM Priority
 
-1. **HBSP-31:** add the extensible outcome/event envelope.
-2. **HBSP-32:** add and prove the cross-provider conformance kit.
-3. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
+1. **HBSP-32:** add and prove the cross-provider conformance kit.
+2. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
 
 Do not start Calculator Phase 2 from this backlog. Complete and reconcile HBSP-28..33 first, then
 promote the consumer-side pilot in `calculator-screenplay-bdd` by explicit owner decision.

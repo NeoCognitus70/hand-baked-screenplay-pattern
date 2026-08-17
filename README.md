@@ -231,6 +231,12 @@ Reporting is **one report per run**: a successful write on `testRunFinishes()`
 clears the reporter's event buffer, so a reporter that observes a second run
 renders only that run's scenes (each write replaces `index.html`).
 
+Provider adapters can attach an optional typed `ExecutionExtension` to domain
+events, preserving native outcomes and metadata without changing the canonical
+event names or fields. The built-in reporters ignore unknown extensions. One
+runner/provider must remain the sole lifecycle owner for a scenario; see
+[Guide 03](./docs/03-event-notification-layer.md#21-provider-extensions-without-flattened-outcomes).
+
 This is **deliberately minimal** — one static, post-run HTML file. It is *not* a
 Serenity/JS reporter: there is no live streaming, no screenshots, no JSON feed,
 and no multi-file dashboard. For production-grade reporting, use Serenity/JS (see

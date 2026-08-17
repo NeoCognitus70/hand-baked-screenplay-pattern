@@ -28,7 +28,12 @@ export {
   testRunFinishes,
 } from './Stage.js';
 export { Outcome } from './Outcome.js';
-export type { DomainEvent, DomainEventInput, StageCrewMember } from './StageEvents.js';
+export type {
+  DomainEvent,
+  DomainEventInput,
+  ExecutionExtension,
+  StageCrewMember,
+} from './StageEvents.js';
 export type {
   ActivityActor,
   AnswersQuestions,

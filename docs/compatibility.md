@@ -80,6 +80,21 @@ These additions do not require a Calculator source rewrite. Its frozen imports,
 class-based abilities, `Question.about(...)` calls, and Actor method
 relationships continue to compile under the canaries above.
 
+## HBSP-31 additive event envelope
+
+HBSP-31 adds the package-root `ExecutionExtension<ProviderOutcome,
+ProviderMetadata>` type and an optional `extension` field to every
+`DomainEventInput` / `DomainEvent`. The existing six event names, all required
+fields, timestamp stamping, ordering, and canonical `Outcome` remain unchanged.
+The `Stage` lifecycle methods accept the extension as a final optional argument,
+so every existing call remains source-compatible.
+
+Built-in reporters deliberately ignore unknown extensions and continue to
+render the canonical event stream. Provider-specific observers can read the
+envelope without forcing environment-blocked, product-failed, or other native
+outcomes into one generic error category. Calculator does not need a source
+rewrite.
+
 ## Deprecation policy
 
 If a baseline member must eventually change:
