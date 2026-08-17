@@ -1,0 +1,15 @@
+export {
+  providerConformanceCases,
+  runProviderConformance,
+  type ConformanceActivity,
+  type ConformanceActor,
+  type ConformanceCaseResult,
+  type ConformanceEvent,
+  type ConformanceMemory,
+  type ConformanceProvider,
+  type ConformanceQuestion,
+  type ConformanceScenario,
+  type ConformanceSceneOutcome,
+  type ProviderConformanceCase,
+  type ProviderConformanceReport,
+} from './ProviderConformance.js';

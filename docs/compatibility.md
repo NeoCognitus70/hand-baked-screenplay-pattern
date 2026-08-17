@@ -95,6 +95,19 @@ envelope without forcing environment-blocked, product-failed, or other native
 outcomes into one generic error category. Calculator does not need a source
 rewrite.
 
+## HBSP-32 additive conformance kit
+
+HBSP-32 exports the test-framework-neutral `ConformanceProvider` contract,
+`providerConformanceCases`, `runProviderConformance(...)`, and their supporting
+types. They are an optional provider-test entry point; they do not replace or
+alter `Actor`, `Ability`, `Question`, `Stage`, events, or the Calculator's
+package-root imports. The kit has no framework or runner runtime dependency.
+
+Providers adapt their native objects at the test boundary. The hand-baked and
+independent minimal fixtures run the same semantic cases without mixing native
+runtime objects in one execution lane, preserving the ADR 0001 boundary and
+requiring no Calculator source rewrite.
+
 ## Deprecation policy
 
 If a baseline member must eventually change:

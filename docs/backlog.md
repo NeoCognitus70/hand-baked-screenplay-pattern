@@ -7,6 +7,11 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 17 — **HBSP-32 COMPLETE** (2026-08-17): a dependency-free provider harness, four
+reusable semantic cases, and an aggregate runner now prove both the hand-baked async provider and an
+independent minimal implementation. A deliberately broken fixture is detected. The full gate passes
+at 18 files / 128 tests. There is now **1 outstanding MEDIUM item**, HBSP-33.
+
 **Version:** 16 — **HBSP-31 COMPLETE** (2026-08-17): every canonical domain event can now carry a
 typed, provider-owned `ExecutionExtension` that preserves native outcomes and metadata without
 changing existing event names, required fields, order, or reporter behaviour. Lifecycle and reporter
@@ -55,7 +60,7 @@ against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no 
 reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
 review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
 **Last Updated:** 2026-08-17
-**Based on:** implementation baseline `f707bf9` (`main`, clean and aligned with `origin/main`), the
+**Based on:** implementation baseline `a35e720` (`main`, clean and aligned with `origin/main`), the
 owner-approved provider-first promotion, accepted ADR 0001, the HBSP-29 Calculator compatibility
 baseline, and the portfolio assessment
 `project-specs/potential-project-outlines/hand-baked-screenplay-pattern-provider-switching-viability.md`.
@@ -208,7 +213,7 @@ failed scenes emit exactly one start/finish pair, and existing console/HTML repo
 the extension. Guide 03 documents single-owner lifecycle composition. `npm run verify` is green at
 17 files / 123 tests. HBSP-32 is now the first actionable item.
 
-#### HBSP-32: Add a reusable cross-provider conformance kit — Score: 14
+#### HBSP-32: Add a reusable cross-provider conformance kit — Score: 14 — ✅ COMPLETE 2026-08-17
 
 **Priority Score:** Security Impact (0) + Breakage Probability (7) + Maintenance Burden (7) = **14 points**
 
@@ -218,17 +223,25 @@ the extension. Guide 03 documents single-owner lifecycle composition. `npm run v
 provider to expose identical runtime classes or reporting features.
 
 **Acceptance criteria:**
-- [ ] Define a small provider test-harness contract and reusable cases that can run against the
+- [x] Define a small provider test-harness contract and reusable cases that can run against the
       hand-baked async provider and an independent minimal fixture implementation.
-- [ ] Prove ability isolation and clear missing-ability failure; ordered activity execution and stop-on-
+- [x] Prove ability isolation and clear missing-ability failure; ordered activity execution and stop-on-
       failure; synchronous and asynchronous question resolution; actor/scenario memory isolation;
       description preservation; and exactly-once lifecycle start/finish/failure semantics.
-- [ ] Include a provider-specific outcome case showing that extension information survives without
+- [x] Include a provider-specific outcome case showing that extension information survives without
       becoming part of the minimum portable semantics.
-- [ ] Document how a TypeScript provider consumes the kit and keep framework/runner dependencies out of
+- [x] Document how a TypeScript provider consumes the kit and keep framework/runner dependencies out of
       the core runtime package.
-- [ ] A deliberately non-conforming fixture demonstrates that the kit detects contract drift;
+- [x] A deliberately non-conforming fixture demonstrates that the kit detects contract drift;
       `npm run verify` remains green. **Type:** code + test + docs.
+
+**Status:** ✅ COMPLETE 2026-08-17. The public `ConformanceProvider` contract, four
+`providerConformanceCases`, and `runProviderConformance(...)` are independent of any test framework.
+`spec/provider-conformance.spec.ts` runs them unchanged against the real hand-baked adapter and an
+independent minimal implementation; both pass. A minimal variant that continues after failure fails
+exactly the stop-on-failure case, proving drift detection. Guide 05 documents TypeScript adoption,
+opaque native outcomes and single-owner lifecycle composition. `npm run verify` is green at 18 files
+/ 128 tests. HBSP-33 is now the first actionable item.
 
 #### HBSP-33: Produce immutable versioned distribution with verified ESM and CommonJS entry points — Score: 13
 
@@ -744,10 +757,10 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 | Priority | Count | Total Effort | Status Distribution |
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
-| MEDIUM (10–19) | 2 | 2M | HBSP-32..33 open; dependency-ordered |
+| MEDIUM (10–19) | 1 | 1M | HBSP-33 open; final provider-first item |
 | LOW (0–9) | 0 | — | — |
-| **Total Outstanding** | **2** | **2M** | **HBSP-32..33 remain in the provider-first sequence** |
-| Resolved | 31 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..31 (2026-08-17) |
+| **Total Outstanding** | **1** | **1M** | **HBSP-33 remains in the provider-first sequence** |
+| Resolved | 32 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..32 (2026-08-17) |
 
 ---
 
@@ -763,8 +776,7 @@ sequence below before opening later portfolio phases.
 
 ### MEDIUM Priority
 
-1. **HBSP-32:** add and prove the cross-provider conformance kit.
-2. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
+1. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
 
 Do not start Calculator Phase 2 from this backlog. Complete and reconcile HBSP-28..33 first, then
 promote the consumer-side pilot in `calculator-screenplay-bdd` by explicit owner decision.

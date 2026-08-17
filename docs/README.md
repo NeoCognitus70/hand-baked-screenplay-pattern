@@ -16,6 +16,7 @@ worked examples, diagrams, and "why", over exhaustive API reference.
 | 02 | [Writing your own Ability, Interaction, and Question](./02-writing-your-own-building-blocks.md) | A hands-on guide to extending the library: build a new capability from scratch and see how the three core building blocks fit together. |
 | 03 | [How the event / notification layer works](./03-event-notification-layer.md) | The domain-event model, how the `Stage` broadcasts to its crew, writing your own `StageCrewMember`, and rebuilding the activity tree from the event stream. |
 | 04 | [Portable Questions and ability tokens](./04-portable-questions-and-abilities.md) | Structural `QuestionLike<T>` adapters, typed token bindings for existing objects, inference, lifetime, and the one-provider execution boundary. |
+| 05 | [Provider conformance kit](./05-provider-conformance-kit.md) | Adapting a TypeScript provider to the reusable semantic cases, test-runner integration, native outcome preservation, and drift detection. |
 
 More guides will be added here over time.
 
