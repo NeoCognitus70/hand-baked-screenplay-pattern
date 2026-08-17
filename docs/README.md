@@ -23,3 +23,9 @@ More guides will be added here over time.
 | ADR | Decision | Status |
 |---|---|---|
 | 0001 | [Select Screenplay providers at build or profile time](./adr/0001-provider-selection-boundary.md) | Accepted |
+
+## Compatibility
+
+- [Calculator compatibility baseline](./compatibility.md) — the package-root
+  runtime and type surface protected during the provider-first iteration, plus
+  its additive-change and deprecation policy.

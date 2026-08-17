@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   provider selection, one provider and lifecycle owner per execution lane, and
   the zero-runtime-dependency boundary for the Promise-native core before
   portable provider contracts are introduced.
+- **Calculator compatibility baseline:** the exact package-root runtime names
+  and type shapes consumed by the sibling Calculator are now documented and
+  protected by runtime and compile-time canaries, with an additive-change and
+  deprecation policy for the provider-first iteration.
 - **`Cast.whereEachActorCan(() => [...])`**: a cast factory that builds fresh
   ability instances **per actor**, so mutable abilities (`ManageData`'s store,
   `MakeRequests`'s last response) are no longer shared between actors on the same
