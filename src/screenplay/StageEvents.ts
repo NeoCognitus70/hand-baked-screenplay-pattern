@@ -1,11 +1,23 @@
 import type { Outcome } from './Outcome.js';
 
 /**
- * Domain events as announced by call sites, before the {@link Stage} stamps
- * them with a timestamp. Callers (actors, the scene helper, facade methods)
- * build these; crew members never see them un-stamped.
+ * Opaque provider-owned data carried alongside a canonical domain event.
+ *
+ * The core and its built-in reporters do not interpret this envelope. An
+ * adapter can therefore retain a native outcome (for example, distinguishing
+ * an environment-blocked scenario from a product failure) and any associated
+ * metadata without widening or flattening the existing {@link Outcome} model.
  */
-export type DomainEventInput =
+export interface ExecutionExtension<ProviderOutcome = unknown, ProviderMetadata = unknown> {
+  /** Stable name of the provider or runner that owns this execution lane. */
+  readonly provider: string;
+  /** The provider's native outcome, preserved without core translation. */
+  readonly outcome?: ProviderOutcome;
+  /** Additional provider-owned event or scenario metadata. */
+  readonly metadata?: ProviderMetadata;
+}
+
+type DomainEventDetails =
   | { readonly type: 'activity:starts'; readonly actor: string; readonly activity: string }
   | { readonly type: 'activity:finishes'; readonly actor: string; readonly activity: string }
   | {
@@ -17,6 +29,16 @@ export type DomainEventInput =
   | { readonly type: 'scene:starts'; readonly name: string }
   | { readonly type: 'scene:finishes'; readonly name: string; readonly outcome: Outcome }
   | { readonly type: 'test-run:finishes' };
+
+/**
+ * Domain events as announced by call sites, before the {@link Stage} stamps
+ * them with a timestamp. Callers (actors, the scene helper, facade methods)
+ * build these; crew members never see them un-stamped. The optional extension
+ * is additive: every existing event name and required field remains unchanged.
+ */
+export type DomainEventInput = DomainEventDetails & {
+  readonly extension?: ExecutionExtension;
+};
 
 /**
  * Domain events announced by the {@link Stage} as actors perform activities,

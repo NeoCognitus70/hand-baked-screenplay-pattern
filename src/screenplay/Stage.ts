@@ -2,7 +2,12 @@ import { ConfigurationError } from '../errors/index.js';
 import { Actor } from './Actor.js';
 import { Cast } from './Cast.js';
 import type { Outcome } from './Outcome.js';
-import type { DomainEvent, DomainEventInput, StageCrewMember } from './StageEvents.js';
+import type {
+  DomainEvent,
+  DomainEventInput,
+  ExecutionExtension,
+  StageCrewMember,
+} from './StageEvents.js';
 
 /**
  * The {@link Stage} is where the performance takes place. It instantiates and
@@ -78,23 +83,35 @@ export class Stage {
   /**
    * Announces that a named scene (a test case, in runner terms) has started.
    */
-  sceneStarts(name: string): void {
-    this.announce({ type: 'scene:starts', name });
+  sceneStarts(name: string, extension?: ExecutionExtension): void {
+    this.announce(
+      extension === undefined
+        ? { type: 'scene:starts', name }
+        : { type: 'scene:starts', name, extension },
+    );
   }
 
   /**
    * Announces that a named scene has finished with the given {@link Outcome}.
    */
-  sceneFinishes(name: string, outcome: Outcome): void {
-    this.announce({ type: 'scene:finishes', name, outcome });
+  sceneFinishes(name: string, outcome: Outcome, extension?: ExecutionExtension): void {
+    this.announce(
+      extension === undefined
+        ? { type: 'scene:finishes', name, outcome }
+        : { type: 'scene:finishes', name, outcome, extension },
+    );
   }
 
   /**
    * Announces that the test run has finished — the terminal signal that lets
    * reporting crew members render and write their output.
    */
-  testRunFinishes(): void {
-    this.announce({ type: 'test-run:finishes' });
+  testRunFinishes(extension?: ExecutionExtension): void {
+    this.announce(
+      extension === undefined
+        ? { type: 'test-run:finishes' }
+        : { type: 'test-run:finishes', extension },
+    );
   }
 }
 
@@ -132,23 +149,27 @@ export function actorInTheSpotlight(): Actor {
 /**
  * Announces on the default {@link Stage} that a named scene has started.
  */
-export function sceneStarts(name: string): void {
-  defaultStage.sceneStarts(name);
+export function sceneStarts(name: string, extension?: ExecutionExtension): void {
+  defaultStage.sceneStarts(name, extension);
 }
 
 /**
  * Announces on the default {@link Stage} that a named scene has finished with
  * the given {@link Outcome}.
  */
-export function sceneFinishes(name: string, outcome: Outcome): void {
-  defaultStage.sceneFinishes(name, outcome);
+export function sceneFinishes(
+  name: string,
+  outcome: Outcome,
+  extension?: ExecutionExtension,
+): void {
+  defaultStage.sceneFinishes(name, outcome, extension);
 }
 
 /**
  * Announces on the default {@link Stage} that the test run has finished.
  */
-export function testRunFinishes(): void {
-  defaultStage.testRunFinishes();
+export function testRunFinishes(extension?: ExecutionExtension): void {
+  defaultStage.testRunFinishes(extension);
 }
 
 /**

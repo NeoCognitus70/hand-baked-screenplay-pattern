@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Extensible event envelope:** every existing domain event can carry an
+  optional typed `ExecutionExtension<ProviderOutcome, ProviderMetadata>` that
+  preserves a provider's native outcome and metadata without flattening it into
+  the canonical `Outcome`. `sceneStarts`, `sceneFinishes`, and
+  `testRunFinishes` accept the envelope additively; existing event names,
+  required fields, ordering, reporters, and call sites remain unchanged.
 - **Portable Question and ability contracts:** `QuestionLike<T>` lets adapters
   supply synchronous or asynchronous structural questions without extending
   `Question`, while `AbilityToken.named<T>(name)` and typed `.bind(object)`
