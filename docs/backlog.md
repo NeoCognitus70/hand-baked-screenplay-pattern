@@ -7,6 +7,12 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 13 — **HBSP-28 COMPLETE** (2026-08-17): accepted
+[`ADR 0001`](./adr/0001-provider-selection-boundary.md), establishing build/profile-time provider
+selection, one provider and lifecycle owner per execution lane, explicit non-goals, and the
+zero-runtime-dependency core boundary. There are now **5 outstanding MEDIUM items**, HBSP-29..33,
+which remain dependency-ordered. Calculator Phase 2 remains outside this backlog.
+
 **Version:** 12 — **provider-first iteration promoted** (2026-08-16): Phase 0 (record the provider
 boundary) and Phase 1 (harden the provider) from the portfolio provider-switching viability assessment
 are authorised as **HBSP-28..33**. There are now **6 outstanding MEDIUM items**, executed in dependency
@@ -30,9 +36,9 @@ against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no 
 "no outstanding items" notes below are updated accordingly. v8 recorded the CGX-01 release-truth
 reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
 review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
-**Last Updated:** 2026-08-16
-**Based on:** repo at commit `7008565` (`main`, clean and aligned with `origin/main`; latest default-
-branch CI green), the owner-approved provider-first promotion, and the portfolio assessment
+**Last Updated:** 2026-08-17
+**Based on:** implementation baseline `6c9c911` (`main`, clean and aligned with `origin/main`), the
+owner-approved provider-first promotion, accepted ADR 0001, and the portfolio assessment
 `project-specs/potential-project-outlines/hand-baked-screenplay-pattern-provider-switching-viability.md`.
 Prior implementation baseline: commit `2a5e93f` (PRs #35–#40 merged: CGX-01..06; `npm run verify`
 green at 104 tests, `npm audit` clean, release `v0.2.0` live); fourth review-derived worklist
@@ -71,7 +77,7 @@ consumer migrations, a Cypress runtime adapter, a Python/C# bridge, a Serenity r
 level runtime switching, or report feature parity. Those are separate project decisions after this
 provider baseline is complete.
 
-#### HBSP-28: Record the provider-selection boundary and non-goals in an ADR — Score: 18
+#### HBSP-28: Record the provider-selection boundary and non-goals in an ADR — Score: 18 — ✅ COMPLETE 2026-08-17
 
 **Priority Score:** Security Impact (0) + Breakage Probability (9) + Maintenance Burden (9) = **18 points**
 
@@ -83,15 +89,19 @@ with one provider owning an Actor and all Activities in an execution lane. Prese
 Promise-native core and make the iteration's exclusions explicit before any public contract changes.
 
 **Acceptance criteria:**
-- [ ] Add a numbered ADR under `docs/adr/` with status, context, decision, consequences and revisit
+- [x] Add a numbered ADR under `docs/adr/` with status, context, decision, consequences and revisit
       triggers; link it from the relevant documentation index.
-- [ ] State that native runtime objects from different providers must not be mixed in one Actor or
+- [x] State that native runtime objects from different providers must not be mixed in one Actor or
       scenario, and that scenario-level hot switching is not supported.
-- [ ] State that identical Serenity-grade reporting, universal execution effects, Cypress-to-Promise
+- [x] State that identical Serenity-grade reporting, universal execution effects, Cypress-to-Promise
       conversion, and JavaScript bridges for Python/C# are non-goals.
-- [ ] Preserve zero runtime dependencies in the core; framework integrations belong in companion
+- [x] Preserve zero runtime dependencies in the core; framework integrations belong in companion
       adapters or consumer-owned composition modules.
-- [ ] `npm run verify` remains green. **Type:** architecture/docs.
+- [x] `npm run verify` remains green. **Type:** architecture/docs.
+
+**Status:** ✅ COMPLETE 2026-08-17. [`ADR 0001`](./adr/0001-provider-selection-boundary.md) records
+the accepted boundary and is indexed from `docs/README.md`; the project gate remains green at 109
+tests. HBSP-29 is now the first actionable item.
 
 #### HBSP-29: Freeze the Calculator-consumed API as the compatibility baseline — Score: 17
 
@@ -694,10 +704,10 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 | Priority | Count | Total Effort | Status Distribution |
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
-| MEDIUM (10–19) | 6 | 2S + 4M | HBSP-28..33 open; dependency-ordered |
+| MEDIUM (10–19) | 5 | 1S + 4M | HBSP-29..33 open; dependency-ordered |
 | LOW (0–9) | 0 | — | — |
-| **Total Outstanding** | **6** | **2S + 4M** | **Provider-first Phases 0–1 promoted** |
-| Resolved | 27 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04) |
+| **Total Outstanding** | **5** | **1S + 4M** | **HBSP-29..33 remain in the provider-first sequence** |
+| Resolved | 28 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28 (2026-08-17) |
 
 ---
 
@@ -713,12 +723,11 @@ sequence below before opening later portfolio phases.
 
 ### MEDIUM Priority
 
-1. **HBSP-28:** record the provider boundary and non-goals.
-2. **HBSP-29:** freeze the Calculator-consumed compatibility baseline.
-3. **HBSP-30:** add portable Question and ability-token contracts.
-4. **HBSP-31:** add the extensible outcome/event envelope.
-5. **HBSP-32:** add and prove the cross-provider conformance kit.
-6. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
+1. **HBSP-29:** freeze the Calculator-consumed compatibility baseline.
+2. **HBSP-30:** add portable Question and ability-token contracts.
+3. **HBSP-31:** add the extensible outcome/event envelope.
+4. **HBSP-32:** add and prove the cross-provider conformance kit.
+5. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
 
 Do not start Calculator Phase 2 from this backlog. Complete and reconcile HBSP-28..33 first, then
 promote the consumer-side pilot in `calculator-screenplay-bdd` by explicit owner decision.
