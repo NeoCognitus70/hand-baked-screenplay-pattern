@@ -17,3 +17,9 @@ worked examples, diagrams, and "why", over exhaustive API reference.
 | 03 | [How the event / notification layer works](./03-event-notification-layer.md) | The domain-event model, how the `Stage` broadcasts to its crew, writing your own `StageCrewMember`, and rebuilding the activity tree from the event stream. |
 
 More guides will be added here over time.
+
+## Architecture decisions
+
+| ADR | Decision | Status |
+|---|---|---|
+| 0001 | [Select Screenplay providers at build or profile time](./adr/0001-provider-selection-boundary.md) | Accepted |
