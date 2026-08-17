@@ -7,6 +7,14 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 19 — **v0.3.0 RELEASED** (2026-08-17): lightweight tag `v0.3.0` points to the PR #54
+merge commit `3560e76`; release workflow run
+[`32057409492`](https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/actions/runs/32057409492)
+published the versioned tarball and SHA-256 checksum to the
+[`v0.3.0` GitHub release](https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/releases/tag/v0.3.0).
+The downloaded artifact independently verified as
+`ac5bd1f6d9bddf95c9a42f99f05f093c7875b1835ecd3ae0d5ca2385e810c36d`.
+
 **Version:** 18 — **HBSP-33 COMPLETE** (2026-08-17): version 0.3.0 now exposes verified ESM and
 CommonJS package-root entry points, and the real packed artifact passes clean-room runtime and type
 smokes in both module systems. A tag-driven workflow publishes that immutable `.tgz` and its SHA-256
@@ -66,7 +74,7 @@ against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no 
 reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
 review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
 **Last Updated:** 2026-08-17
-**Based on:** implementation baseline `b9ff7ca` (`main`, clean and aligned with `origin/main`), the
+**Based on:** release baseline `3560e76` (`main`, clean and aligned with `origin/main`), the
 owner-approved provider-first promotion, accepted ADR 0001, the HBSP-29 Calculator compatibility
 baseline, and the portfolio assessment
 `project-specs/potential-project-outlines/hand-baked-screenplay-pattern-provider-switching-viability.md`.
@@ -277,8 +285,10 @@ tarball, rejects files outside `package.json`, `LICENSE`, `README.md`, `CHANGELO
 confirms zero runtime dependencies, and installs it into independent ESM and CommonJS fixtures for
 runtime and strict TypeScript compilation. `npm run verify` is green at 18 files / 128 unit tests plus
 both package smokes. The release workflow validates the tag against the manifest and changelog, repeats
-that gate, and attaches the versioned tarball and checksum to the matching GitHub release. The actual
-`v0.3.0` tag must target the merge commit so the immutable release is never cut from an unmerged branch.
+that gate, and attaches the versioned tarball and checksum to the matching GitHub release. Lightweight
+tag `v0.3.0` now points to merge commit `3560e76`; workflow run `32057409492` published the release,
+and an independent download matched the attached SHA-256 checksum
+`ac5bd1f6d9bddf95c9a42f99f05f093c7875b1835ecd3ae0d5ca2385e810c36d`.
 
 ---
 
