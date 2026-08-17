@@ -1,4 +1,5 @@
 import type { Ability, AbilityType } from './Ability.js';
+import type { AbilityRegistration, AbilityToken } from './AbilityToken.js';
 import type { Activity } from './Activity.js';
 import type { Answerable } from './Answerable.js';
 
@@ -15,6 +16,7 @@ export interface PerformsActivities {
  */
 export interface UsesAbilities {
   abilityTo<T extends Ability>(doSomething: AbilityType<T>): T;
+  abilityTo<T extends object>(doSomething: AbilityToken<T>): T;
 }
 
 /**
@@ -29,7 +31,7 @@ export interface AnswersQuestions {
  * The capability of being granted {@link Ability abilities}.
  */
 export interface CanHaveAbilities<Returned = UsesAbilities> {
-  whoCan(...abilities: Ability[]): Returned;
+  whoCan(...abilities: AbilityRegistration[]): Returned;
 }
 
 /**

@@ -1,5 +1,10 @@
 import { ConfigurationError } from '../errors/index.js';
 import { Ability, type AbilityType } from './Ability.js';
+import {
+  AbilityBinding,
+  AbilityToken,
+  type AbilityRegistration,
+} from './AbilityToken.js';
 import type { Activity } from './Activity.js';
 import type { Answerable } from './Answerable.js';
 import type {
@@ -8,7 +13,7 @@ import type {
   PerformsActivities,
   UsesAbilities,
 } from './capabilities.js';
-import { Question } from './Question.js';
+import { isQuestionLike } from './Question.js';
 import type { Stage } from './Stage.js';
 
 /**
@@ -30,23 +35,35 @@ export class Actor
     AnswersQuestions,
     CanHaveAbilities<Actor>
 {
-  private readonly abilities = new Map<AbilityType<Ability>, Ability>();
+  private readonly abilities = new Map<object, object>();
 
   constructor(
     public readonly name: string,
     private readonly stage: Stage,
   ) {}
 
-  whoCan(...abilities: Ability[]): Actor {
+  whoCan(...abilities: AbilityRegistration[]): Actor {
     for (const ability of abilities) {
-      this.abilities.set(ability.abilityType(), ability);
+      if (ability instanceof AbilityBinding) {
+        this.abilities.set(ability.token, ability.ability);
+      } else {
+        this.abilities.set(ability.abilityType(), ability);
+      }
     }
     return this;
   }
 
-  abilityTo<T extends Ability>(doSomething: AbilityType<T>): T {
+  abilityTo<T extends Ability>(doSomething: AbilityType<T>): T;
+  abilityTo<T extends object>(doSomething: AbilityToken<T>): T;
+  abilityTo<T extends object>(doSomething: AbilityType<Ability> | AbilityToken<T>): T {
     const ability = this.abilities.get(doSomething);
     if (!ability) {
+      if (doSomething instanceof AbilityToken) {
+        throw new ConfigurationError(
+          `${this.name} does not have the ability bound to ${doSomething.name}. ` +
+            `Did you grant it with whoCan(${doSomething.name}.bind(...))?`,
+        );
+      }
       throw new ConfigurationError(
         `${this.name} does not have the ability to ${doSomething.name}. ` +
           `Did you grant it with whoCan(...)?`,
@@ -75,7 +92,7 @@ export class Actor
   }
 
   async answer<T>(answerable: Answerable<T>): Promise<T> {
-    if (Question.isAQuestion<Promise<T> | T>(answerable)) {
+    if (isQuestionLike<Promise<T> | T>(answerable)) {
       return this.answer(answerable.answeredBy(this));
     }
     // A plain value or a Promise: an async method resolves either identically,

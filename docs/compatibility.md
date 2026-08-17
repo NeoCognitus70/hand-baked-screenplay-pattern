@@ -67,6 +67,19 @@ This deliberately strengthens the package's general pre-1.0 SemVer position
 for the duration of the provider iteration. The baseline is not a freeze on
 the whole API; it protects the surface with a live consumer.
 
+## HBSP-30 additive portability seams
+
+HBSP-30 adds `QuestionLike<T>`, `isQuestionLike`, `AbilityToken<T>`,
+`AbilityBinding<T>`, and `AbilityRegistration` at the package root. Existing
+`Question` instances implement the structural protocol, while
+`Actor.answer(...)` now recognises that protocol without changing its
+Promise-native result. Existing `Ability` subclasses still register and resolve
+by class; the token overload adds identity-based lookup for bound objects.
+
+These additions do not require a Calculator source rewrite. Its frozen imports,
+class-based abilities, `Question.about(...)` calls, and Actor method
+relationships continue to compile under the canaries above.
+
 ## Deprecation policy
 
 If a baseline member must eventually change:

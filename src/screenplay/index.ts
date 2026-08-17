@@ -1,10 +1,20 @@
 export { Ability, type AbilityType } from './Ability.js';
+export {
+  AbilityBinding,
+  AbilityToken,
+  type AbilityRegistration,
+} from './AbilityToken.js';
 export type { Activity } from './Activity.js';
 export type { Answerable } from './Answerable.js';
 export { Actor } from './Actor.js';
 export { Cast } from './Cast.js';
 export { Interaction, type InteractionBody } from './Interaction.js';
-export { Question, type QuestionBody } from './Question.js';
+export {
+  Question,
+  isQuestionLike,
+  type QuestionBody,
+  type QuestionLike,
+} from './Question.js';
 export { Task } from './Task.js';
 export {
   Stage,

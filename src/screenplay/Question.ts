@@ -7,11 +7,31 @@ import type { AnswersQuestions, UsesAbilities } from './capabilities.js';
 export type QuestionBody<T> = (actor: AnswersQuestions & UsesAbilities) => T;
 
 /**
+ * The portable, structural contract understood by {@link Actor.answer}.
+ * Implement this shape to expose an adapter question without extending the
+ * concrete {@link Question} class.
+ */
+export interface QuestionLike<T> {
+  answeredBy(actor: AnswersQuestions & UsesAbilities): T;
+  toString(): string;
+}
+
+/** Recognises the structural question protocol at runtime. */
+export function isQuestionLike<T>(maybe: unknown): maybe is QuestionLike<T> {
+  return (
+    maybe !== null &&
+    (typeof maybe === 'object' || typeof maybe === 'function') &&
+    typeof (maybe as { answeredBy?: unknown }).answeredBy === 'function' &&
+    typeof (maybe as { toString?: unknown }).toString === 'function'
+  );
+}
+
+/**
  * A {@link Question} represents a query about the state of the system under
  * test. Actors {@link AnswersQuestions.answer answer} questions to make
  * assertions or to feed values into subsequent activities.
  */
-export abstract class Question<T> {
+export abstract class Question<T> implements QuestionLike<T> {
   /**
    * Defines an ad-hoc question from a description and a body function.
    */

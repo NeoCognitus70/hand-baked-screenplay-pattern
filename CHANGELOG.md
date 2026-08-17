@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Portable Question and ability contracts:** `QuestionLike<T>` lets adapters
+  supply synchronous or asynchronous structural questions without extending
+  `Question`, while `AbilityToken.named<T>(name)` and typed `.bind(object)`
+  registrations let actors retrieve existing objects without `Ability`
+  inheritance. Class-based Questions and abilities remain compatible; token
+  lookup is identity-based, missing bindings report actionable
+  `ConfigurationError`s, and both shared and per-actor cast lifetimes work with
+  token bindings.
 - **Provider-selection boundary ADR:** ADR 0001 establishes build/profile-time
   provider selection, one provider and lifecycle owner per execution lane, and
   the zero-runtime-dependency boundary for the Promise-native core before
