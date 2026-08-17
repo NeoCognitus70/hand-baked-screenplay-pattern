@@ -108,6 +108,23 @@ independent minimal fixtures run the same semantic cases without mixing native
 runtime objects in one execution lane, preserving the ADR 0001 boundary and
 requiring no Calculator source rewrite.
 
+## HBSP-33 package-format compatibility
+
+Version 0.3.0 preserves every package-root runtime name and type relationship
+above while adding conditional entry points for both module systems. Native ESM
+consumers resolve `dist/index.js` with `dist/index.d.ts`; CommonJS consumers
+resolve `dist/cjs/index.js` with the matching declaration tree. The root
+`exports` map is the supported boundary in either case, so Calculator's existing
+imports require no source rewrite.
+
+`npm run test:package` proves this contract against the actual packed artifact,
+not the source tree: it installs the `.tgz` into separate clean-room ESM and
+CommonJS fixtures, loads representative runtime exports, and compiles
+representative value and type exports. It also rejects unexpected package files
+or runtime dependencies. The immutable artifact and its SHA-256 checksum are
+published together on the matching GitHub release; the npm registry is not part
+of this compatibility contract.
+
 ## Deprecation policy
 
 If a baseline member must eventually change:

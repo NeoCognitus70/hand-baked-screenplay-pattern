@@ -7,6 +7,12 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 18 — **HBSP-33 COMPLETE** (2026-08-17): version 0.3.0 now exposes verified ESM and
+CommonJS package-root entry points, and the real packed artifact passes clean-room runtime and type
+smokes in both module systems. A tag-driven workflow publishes that immutable `.tgz` and its SHA-256
+checksum to the matching GitHub release. The provider-first sequence is complete with **0 outstanding
+items**; any Calculator consumer pilot requires a separate owner promotion.
+
 **Version:** 17 — **HBSP-32 COMPLETE** (2026-08-17): a dependency-free provider harness, four
 reusable semantic cases, and an aggregate runner now prove both the hand-baked async provider and an
 independent minimal implementation. A deliberately broken fixture is detected. The full gate passes
@@ -60,7 +66,7 @@ against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no 
 reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
 review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
 **Last Updated:** 2026-08-17
-**Based on:** implementation baseline `a35e720` (`main`, clean and aligned with `origin/main`), the
+**Based on:** implementation baseline `b9ff7ca` (`main`, clean and aligned with `origin/main`), the
 owner-approved provider-first promotion, accepted ADR 0001, the HBSP-29 Calculator compatibility
 baseline, and the portfolio assessment
 `project-specs/potential-project-outlines/hand-baked-screenplay-pattern-provider-switching-viability.md`.
@@ -243,7 +249,7 @@ exactly the stop-on-failure case, proving drift detection. Guide 05 documents Ty
 opaque native outcomes and single-owner lifecycle composition. `npm run verify` is green at 18 files
 / 128 tests. HBSP-33 is now the first actionable item.
 
-#### HBSP-33: Produce immutable versioned distribution with verified ESM and CommonJS entry points — Score: 13
+#### HBSP-33: Produce immutable versioned distribution with verified ESM and CommonJS entry points — Score: 13 — ✅ COMPLETE 2026-08-17
 
 **Priority Score:** Security Impact (3) + Breakage Probability (5) + Maintenance Burden (5) = **13 points**
 
@@ -253,17 +259,26 @@ opaque native outcomes and single-owner lifecycle composition. `npm run verify` 
 versioned provider artefact that works in native ESM and CommonJS-hosted consumers.
 
 **Acceptance criteria:**
-- [ ] Add conditional `exports` with verified `types`, `import`, and `require` entry points while
+- [x] Add conditional `exports` with verified `types`, `import`, and `require` entry points while
       preserving the package-root imports frozen by HBSP-29.
-- [ ] Add clean-room pack/install smoke fixtures that load the packed artefact through both ESM
+- [x] Add clean-room pack/install smoke fixtures that load the packed artefact through both ESM
       `import` and CommonJS `require`, and exercise representative runtime and type exports.
-- [ ] Document and automate one canonical immutable channel: a versioned `npm pack` artefact attached
+- [x] Document and automate one canonical immutable channel: a versioned `npm pack` artefact attached
       to the matching GitHub release with a SHA-256 checksum. npm-registry publication is not required
       for this iteration.
-- [ ] Cut the next appropriate version only after HBSP-28..32 pass; document compatibility and release
+- [x] Cut the next appropriate version only after HBSP-28..32 pass; document compatibility and release
       steps in `CHANGELOG.md` and `docs/releasing.md`.
-- [ ] The published package contains only intended files, retains zero runtime dependencies, and passes
+- [x] The published package contains only intended files, retains zero runtime dependencies, and passes
       `npm run verify` plus both pack-install smoke paths. **Type:** packaging + CI + test + docs.
+
+**Status:** ✅ COMPLETE 2026-08-17. Version 0.3.0 adds conditional ESM/CommonJS runtime and declaration
+entry points without changing the HBSP-29 package-root API. `npm run test:package` builds the real
+tarball, rejects files outside `package.json`, `LICENSE`, `README.md`, `CHANGELOG.md`, and `dist/**`,
+confirms zero runtime dependencies, and installs it into independent ESM and CommonJS fixtures for
+runtime and strict TypeScript compilation. `npm run verify` is green at 18 files / 128 unit tests plus
+both package smokes. The release workflow validates the tag against the manifest and changelog, repeats
+that gate, and attaches the versioned tarball and checksum to the matching GitHub release. The actual
+`v0.3.0` tag must target the merge commit so the immutable release is never cut from an unmerged branch.
 
 ---
 
@@ -757,10 +772,10 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 | Priority | Count | Total Effort | Status Distribution |
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
-| MEDIUM (10–19) | 1 | 1M | HBSP-33 open; final provider-first item |
+| MEDIUM (10–19) | 0 | — | — |
 | LOW (0–9) | 0 | — | — |
-| **Total Outstanding** | **1** | **1M** | **HBSP-33 remains in the provider-first sequence** |
-| Resolved | 32 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..32 (2026-08-17) |
+| **Total Outstanding** | **0** | **—** | **Provider-first sequence complete** |
+| Resolved | 33 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..33 (2026-08-17) |
 
 ---
 
@@ -776,10 +791,8 @@ sequence below before opening later portfolio phases.
 
 ### MEDIUM Priority
 
-1. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
-
-Do not start Calculator Phase 2 from this backlog. Complete and reconcile HBSP-28..33 first, then
-promote the consumer-side pilot in `calculator-screenplay-bdd` by explicit owner decision.
+None. HBSP-28..33 are complete. Do not start Calculator Phase 2 from this backlog; promote the
+consumer-side pilot in `calculator-screenplay-bdd` only by explicit owner decision.
 
 ### LOW Priority
 

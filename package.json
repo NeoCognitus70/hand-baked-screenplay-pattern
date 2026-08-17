@@ -1,14 +1,21 @@
 {
   "name": "hand-baked-screenplay-pattern",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A hand-baked, dependency-free TypeScript implementation of the Screenplay Pattern, following the design model and naming conventions popularised by Serenity/JS (but independent of it).",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
     }
   },
   "files": [
@@ -25,13 +32,18 @@
     "url": "https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/issues"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "clean": "node scripts/clean-dist.mjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && node scripts/write-cjs-package.mjs",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "typecheck": "tsc -p tsconfig.spec.json",
     "test": "vitest run",
+    "test:package": "node scripts/test-packed-package.mjs",
     "coverage": "vitest run --coverage",
-    "verify": "npm run typecheck && npm run build && npm test",
+    "verify": "npm run typecheck && npm run build && npm test && npm run test:package",
     "report:sample": "npm run build && node scripts/generate-sample-report.mjs",
     "test:watch": "vitest",
+    "prepack": "npm run verify",
     "prepublishOnly": "npm run verify"
   },
   "keywords": [

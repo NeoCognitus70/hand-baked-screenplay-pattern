@@ -32,12 +32,32 @@ await actor.attemptsTo(
 
 ## Installation
 
+For repository development:
+
 ```bash
 npm install
-npm run verify   # typecheck + build + test
+npm run verify   # typecheck + build + unit tests + packed-package smokes
 ```
 
-This package targets Node.js 20+ and is shipped as native ES modules.
+For a consumer, download the versioned `.tgz` from the matching
+[GitHub release](https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/releases)
+and install that immutable artifact:
+
+```bash
+gh release download v0.3.0 --pattern '*.tgz'
+npm install ./hand-baked-screenplay-pattern-0.3.0.tgz
+```
+
+This dependency-free package targets Node.js 20+ and exposes the same
+package-root API to native ESM `import` and CommonJS `require` consumers:
+
+```js
+// ESM
+import { Cast, Question, Stage } from 'hand-baked-screenplay-pattern';
+
+// CommonJS
+const { Cast, Question, Stage } = require('hand-baked-screenplay-pattern');
+```
 
 ## The building blocks
 
@@ -297,10 +317,11 @@ spec/            Vitest specs, including end-to-end worked examples
 
 | Script              | Description |
 | ------------------- | ----------- |
-| `npm run typecheck` | Type-check `src` and `spec` with no emit. |
-| `npm run build`     | Compile `src` to `dist/` (JS + `.d.ts`). |
-| `npm test`          | Run the Vitest suite. |
-| `npm run verify`    | typecheck + build + test. |
+| `npm run typecheck`    | Type-check `src` and `spec` with no emit. |
+| `npm run build`        | Compile ESM and CommonJS JavaScript plus declarations to `dist/`. |
+| `npm test`             | Run the Vitest suite. |
+| `npm run test:package` | Pack and install into clean ESM/CommonJS runtime and type fixtures. |
+| `npm run verify`       | Run typecheck, build, unit tests, and both packed-package smokes. |
 
 ## Versioning & changelog
 
@@ -315,9 +336,16 @@ Calculator project follows the stricter additive-change and deprecation policy
 in the [Calculator compatibility baseline](./docs/compatibility.md). This keeps
 the live consumer operational while provider-neutral seams are introduced.
 
-The package publishes its compiled `dist/` (built from source, git-ignored), so
-a `prepublishOnly` hook runs `npm run verify` (typecheck + build + tests) before
-any `npm publish` — the tarball can never ship a missing or stale build.
+The canonical distribution channel is a versioned `npm pack` artifact attached
+to its matching GitHub release, together with a SHA-256 checksum. The tag-driven
+release workflow checks that package, changelog, and tag versions agree, runs
+the complete verification gate, and only then creates the release. The project
+does not publish to the npm registry. See [Releasing](./docs/releasing.md).
+
+Both `prepack` and `prepublishOnly` run `npm run verify`, so a manually produced
+tarball or any future registry publication cannot ship a missing or stale
+build. The smoke harness itself uses `npm pack --ignore-scripts` after the gate
+has built the distribution, avoiding recursive lifecycle execution.
 
 ## Relationship to Serenity/JS
 
