@@ -43,7 +43,10 @@ describe('public API surface (package root exports)', () => {
   const documentedSurface = [
     // screenplay core
     'Actor',
+    'AbilityBinding',
+    'AbilityToken',
     'Outcome',
+    'isQuestionLike',
     // expectations
     'Expectation',
     'isGreaterThan',

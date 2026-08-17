@@ -1,4 +1,4 @@
-import type { Ability } from './Ability.js';
+import type { AbilityRegistration } from './AbilityToken.js';
 import type { Actor } from './Actor.js';
 
 /**
@@ -24,7 +24,7 @@ export abstract class Cast {
    * actors must be isolated, use {@link whereEachActorCan} instead, which builds
    * fresh ability instances per actor.
    */
-  static whereEveryoneCan(...abilities: Ability[]): Cast {
+  static whereEveryoneCan(...abilities: AbilityRegistration[]): Cast {
     return new PreparedCast((actor) => actor.whoCan(...abilities));
   }
 
@@ -40,7 +40,7 @@ export abstract class Cast {
    *   ManageData.usingAnEmptyStore(),    // mutable store is per-actor
    * ]);
    */
-  static whereEachActorCan(abilities: () => Ability[]): Cast {
+  static whereEachActorCan(abilities: () => AbilityRegistration[]): Cast {
     return new PreparedCast((actor) => actor.whoCan(...abilities()));
   }
 

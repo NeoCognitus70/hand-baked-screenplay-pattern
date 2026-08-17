@@ -7,6 +7,12 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 15 — **HBSP-30 COMPLETE** (2026-08-17): exported structural `QuestionLike<T>`
+resolution and identity-based typed ability tokens/bindings, preserving the class-based API frozen
+under HBSP-29. Focused tests cover sync/async inference, class/token lookup, isolation and clear
+missing-binding failure; the full gate is green at 16 files / 120 tests. There are now **3
+outstanding MEDIUM items**, HBSP-31..33, in dependency order.
+
 **Version:** 14 — **HBSP-29 COMPLETE** (2026-08-17): the package-root runtime names and type shapes
 used by Calculator `main` at `2b10090` are frozen in the
 [`Calculator compatibility baseline`](./compatibility.md) and enforced by runtime plus compile-time
@@ -43,7 +49,7 @@ against the project (CGX-01 release-truth, CGX-02 shared abilities) — the "no 
 reconciliation (`v0.2.0` tag + GitHub release created 2026-07-27, resolving Risk 1); v7 closed out
 review v2 (Items #17–#20 record TRIAGE-01/02/03/05; Item #16 / TRIAGE-04 landed in v6).
 **Last Updated:** 2026-08-17
-**Based on:** implementation baseline `b199c6e` (`main`, clean and aligned with `origin/main`), the
+**Based on:** implementation baseline `1665bae` (`main`, clean and aligned with `origin/main`), the
 owner-approved provider-first promotion, accepted ADR 0001, the HBSP-29 Calculator compatibility
 baseline, and the portfolio assessment
 `project-specs/potential-project-outlines/hand-baked-screenplay-pattern-provider-switching-viability.md`.
@@ -136,7 +142,7 @@ runtime and type baseline plus policy; `spec/public-api.spec.ts` and
 `spec/public-api.types.spec.ts` enforce it. `npm run verify` is green at 15 files / 111 tests.
 HBSP-30 is now the first actionable item.
 
-#### HBSP-30: Add additive portable Question and ability-token contracts — Score: 16
+#### HBSP-30: Add additive portable Question and ability-token contracts — Score: 16 — ✅ COMPLETE 2026-08-17
 
 **Priority Score:** Security Impact (0) + Breakage Probability (8) + Maintenance Burden (8) = **16 points**
 
@@ -147,16 +153,24 @@ without requiring `instanceof Question` or inheritance from the concrete `Abilit
 retaining both current classes and their behaviour.
 
 **Acceptance criteria:**
-- [ ] Export a documented structural `QuestionLike<T>` protocol (or an explicitly portable equivalent)
+- [x] Export a documented structural `QuestionLike<T>` protocol (or an explicitly portable equivalent)
       that supports synchronous and asynchronous answers without weakening existing `Question` use.
-- [ ] Export explicit, typed ability tokens/bindings that can register and retrieve an existing object;
+- [x] Export explicit, typed ability tokens/bindings that can register and retrieve an existing object;
       missing abilities continue to fail with a clear configuration error.
-- [ ] Existing `Question`, `Ability`, `Actor.answer`, and `Actor.abilityTo` call sites remain compatible
+- [x] Existing `Question`, `Ability`, `Actor.answer`, and `Actor.abilityTo` call sites remain compatible
       with the HBSP-29 baseline; no consumer rewrite is required.
-- [ ] Focused tests prove class-based and structural Questions, class-based and token-bound abilities,
+- [x] Focused tests prove class-based and structural Questions, class-based and token-bound abilities,
       type inference, isolation, and missing-ability failure.
-- [ ] The core retains zero runtime dependencies and `npm run verify` remains green.
+- [x] The core retains zero runtime dependencies and `npm run verify` remains green.
       **Type:** code + test + docs.
+
+**Status:** ✅ COMPLETE 2026-08-17. `QuestionLike<T>` and `isQuestionLike` provide the structural
+question seam; `AbilityToken<T>` and `AbilityBinding<T>` add typed identity-based object lookup while
+class-based `Question` and `Ability` calls remain compatible. `spec/portable-contracts.spec.ts`
+proves synchronous/asynchronous inference, class/token paths, token identity, per-actor isolation and
+missing-binding diagnostics. [`Guide 04`](./04-portable-questions-and-abilities.md) documents adapter
+composition and the ADR boundary. `npm run verify` is green at 16 files / 120 tests. HBSP-31 is now
+the first actionable item.
 
 #### HBSP-31: Add an extensible outcome and event envelope without breaking existing events — Score: 15
 
@@ -716,10 +730,10 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 | Priority | Count | Total Effort | Status Distribution |
 |---|---|---|---|
 | HIGH (20–30) | 0 | — | — |
-| MEDIUM (10–19) | 4 | 4M | HBSP-30..33 open; dependency-ordered |
+| MEDIUM (10–19) | 3 | 3M | HBSP-31..33 open; dependency-ordered |
 | LOW (0–9) | 0 | — | — |
-| **Total Outstanding** | **4** | **4M** | **HBSP-30..33 remain in the provider-first sequence** |
-| Resolved | 29 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..29 (2026-08-17) |
+| **Total Outstanding** | **3** | **3M** | **HBSP-31..33 remain in the provider-first sequence** |
+| Resolved | 30 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..30 (2026-08-17) |
 
 ---
 
@@ -735,10 +749,9 @@ sequence below before opening later portfolio phases.
 
 ### MEDIUM Priority
 
-1. **HBSP-30:** add portable Question and ability-token contracts.
-2. **HBSP-31:** add the extensible outcome/event envelope.
-3. **HBSP-32:** add and prove the cross-provider conformance kit.
-4. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
+1. **HBSP-31:** add the extensible outcome/event envelope.
+2. **HBSP-32:** add and prove the cross-provider conformance kit.
+3. **HBSP-33:** publish immutable versioned ESM/CommonJS distribution.
 
 Do not start Calculator Phase 2 from this backlog. Complete and reconcile HBSP-28..33 first, then
 promote the consumer-side pilot in `calculator-screenplay-bdd` by explicit owner decision.

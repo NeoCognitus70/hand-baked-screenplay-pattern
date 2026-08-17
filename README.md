@@ -44,10 +44,10 @@ This package targets Node.js 20+ and is shipped as native ES modules.
 | Concept       | Role |
 | ------------- | ---- |
 | **Actor**     | A person or external system interacting with the app. Created via `actorCalled('Ada')` or `stage.actor('Ada')`. |
-| **Ability**   | Wraps an integration (HTTP, a data store, the clock). The *only* place that knows the mechanics. Retrieved with `actor.abilityTo(SomeAbility)`. |
+| **Ability**   | Wraps an integration (HTTP, a data store, the clock). The *only* place that knows the mechanics. Retrieved by class with `actor.abilityTo(SomeAbility)`, or bound as an existing object through a typed `AbilityToken`. |
 | **Task**      | A business-level activity that composes other activities. `Task.where('#actor signs up', ...)`. |
 | **Interaction** | A system-level activity that uses an ability directly. `Interaction.where('#actor clicks', actor => ...)`. |
-| **Question**  | A query about the system's state. `Question.about('the status', actor => ...)`, answered via `actor.answer(...)`. |
+| **Question**  | A query about the system's state. Use `Question.about('the status', actor => ...)` or the structural `QuestionLike<T>` protocol, answered via `actor.answer(...)`. |
 | **Cast**      | Prepares actors with their abilities. `Cast.whereEveryoneCan(...)` shares one ability instance across all actors (stateless abilities); `Cast.whereEachActorCan(() => [...])` builds fresh instances per actor (isolate mutable abilities like `ManageData` / `MakeRequests`). |
 | **Stage**     | Instantiates/caches actors, tracks the one in the spotlight, and announces domain events to its crew. |
 | **Ensure**    | An interaction that asserts a value meets an `Expectation` (`equals`, `isGreaterThan`, `isPresent`, `includes`, ...). |
@@ -152,6 +152,43 @@ const TheTime = Question.about('the current time', (actor) =>
   actor.abilityTo(TellTime).currentTime(),
 );
 ```
+
+### Portable adapter contracts
+
+Adapters can expose a structural `QuestionLike<T>` without extending
+`Question`, and can bind an existing object through an identity-based,
+type-safe `AbilityToken<T>` without extending `Ability`. The original classes
+and their lookup forms remain supported:
+
+```ts
+import {
+  AbilityToken,
+  Cast,
+  Stage,
+  type QuestionLike,
+} from 'hand-baked-screenplay-pattern';
+
+interface Clock {
+  now(): Date;
+}
+
+const Clock = AbilityToken.named<Clock>('Clock');
+const CurrentTime: QuestionLike<Date> = {
+  answeredBy: actor => actor.abilityTo(Clock).now(),
+  toString: () => 'the current time',
+};
+
+const actor = new Stage(
+  Cast.whereEveryoneCan(Clock.bind({ now: () => new Date() })),
+).actor('Ada');
+
+const currentTime: Date = await actor.answer(CurrentTime);
+```
+
+Use `Cast.whereEachActorCan(() => [Clock.bind(...)])` when a bound object owns
+mutable state and each actor needs an isolated instance. See
+[Guide 04](./docs/04-portable-questions-and-abilities.md) for the full contract
+and provider-boundary guidance.
 
 ## Reporting
 
