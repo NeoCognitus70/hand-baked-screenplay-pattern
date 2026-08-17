@@ -7,8 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-17
+
+Provider-portability contracts, a reusable conformance kit, and an immutable
+dual-module distribution baseline.
+
 ### Added
 
+- **Immutable package release channel:** a tag-driven workflow verifies that
+  the tag, manifest, and changelog versions agree, runs the complete gate,
+  creates a versioned `npm pack` artifact, records its SHA-256 checksum, and
+  attaches both files to the matching GitHub release. npm-registry publication
+  remains outside the project contract.
 - **Reusable provider conformance kit:** a small, test-framework-neutral
   `ConformanceProvider` adapter contract, four exported
   `providerConformanceCases`, and `runProviderConformance(...)`. The same cases
@@ -48,6 +58,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`RunReport.status`** (`'passed' | 'failed' | 'empty'`, the new `RunStatus`
   type): an explicit overall run status, so a zero-scene run is a distinct
   neutral state rather than being inferred from the counts.
+
+### Changed
+
+- **Dual ESM/CommonJS package entry points:** conditional package-root exports
+  now provide matching runtime and declaration trees for native `import` and
+  `require` consumers. `npm run verify` packs the real artifact, rejects
+  unintended files or runtime dependencies, installs it into separate
+  clean-room fixtures, and exercises representative runtime and type exports in
+  both module systems. The HBSP-29 Calculator-consumed API remains additive and
+  source-compatible.
 
 ### Fixed
 
@@ -218,6 +238,7 @@ depending on it.
 - **Planning** (`planning/`): a tooling-agnostic implementation plan for a
   forthcoming static HTML reporter.
 
-[Unreleased]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/releases/tag/v0.1.0

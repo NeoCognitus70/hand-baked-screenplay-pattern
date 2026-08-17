@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Verify and publish immutable package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v5
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify tag and release metadata
+        run: node scripts/verify-release-tag.mjs
+
+      - name: Verify source and packed ESM/CommonJS consumers
+        run: npm run verify
+
+      - name: Build versioned artifact and SHA-256 checksum
+        id: pack
+        shell: bash
+        run: |
+          mkdir release
+          package_file="$(npm pack --ignore-scripts --pack-destination release)"
+          (cd release && sha256sum "$package_file" > "$package_file.sha256")
+          echo "package_file=$package_file" >> "$GITHUB_OUTPUT"
+
+      - name: Create matching GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${{ github.ref_name }}"
+          "release/${{ steps.pack.outputs.package_file }}"
+          "release/${{ steps.pack.outputs.package_file }}.sha256"
+          --verify-tag
+          --title "${{ github.ref_name }}"
+          --generate-notes
