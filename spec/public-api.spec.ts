@@ -47,6 +47,8 @@ describe('public API surface (package root exports)', () => {
     'AbilityToken',
     'Outcome',
     'isQuestionLike',
+    'providerConformanceCases',
+    'runProviderConformance',
     // expectations
     'Expectation',
     'isGreaterThan',

@@ -12,4 +12,5 @@ export * from './abilities/index.js';
 export * from './crew/index.js';
 export * from './reporting/index.js';
 export * from './scene/index.js';
+export * from './conformance/index.js';
 export { ConfigurationError, LogicError, AssertionError } from './errors/index.js';

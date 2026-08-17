@@ -190,6 +190,16 @@ mutable state and each actor needs an isolated instance. See
 [Guide 04](./docs/04-portable-questions-and-abilities.md) for the full contract
 and provider-boundary guidance.
 
+### Provider conformance
+
+`providerConformanceCases` and `runProviderConformance(...)` let another
+TypeScript Screenplay provider prove the same minimum observable semantics
+through a small test adapter. The dependency-free kit covers isolation,
+sync/async Questions, ordered execution, stop-on-failure, descriptions,
+lifecycle cardinality, and opaque provider-native outcome survival. It does not
+require providers to share runtime classes or reporting features. See
+[Guide 05](./docs/05-provider-conformance-kit.md).
+
 ## Reporting
 
 Beyond the live `ConsoleReporter`, the library can produce a **single,
@@ -278,6 +288,7 @@ src/
   crew/          ConsoleReporter and HtmlReporter (StageCrewMembers)
   reporting/     Pure report builder (buildReport) and HTML renderer (renderHtml)
   scene/         The scene(name, fn) helper
+  conformance/   Provider adapter contract, reusable semantic cases, and aggregate runner
   errors/        ConfigurationError, LogicError, AssertionError
 spec/            Vitest specs, including end-to-end worked examples
 ```

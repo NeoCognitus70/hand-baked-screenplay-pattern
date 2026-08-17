@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Reusable provider conformance kit:** a small, test-framework-neutral
+  `ConformanceProvider` adapter contract, four exported
+  `providerConformanceCases`, and `runProviderConformance(...)`. The same cases
+  prove the hand-baked async provider and an independent minimal fixture across
+  isolation, sync/async Questions, activity order and stop-on-failure,
+  descriptions, lifecycle cardinality, and provider-native outcome survival; a
+  deliberately broken fixture proves drift detection. The kit adds no runtime
+  dependency or framework coupling.
 - **Extensible event envelope:** every existing domain event can carry an
   optional typed `ExecutionExtension<ProviderOutcome, ProviderMetadata>` that
   preserves a provider's native outcome and metadata without flattening it into
