@@ -26,6 +26,12 @@ More guides will be added here over time.
 |---|---|---|
 | 0001 | [Select Screenplay providers at build or profile time](./adr/0001-provider-selection-boundary.md) | Accepted |
 
+## Test-suite quality
+
+- [Mutation testing](./mutation-testing.md) — what Stryker measures, how to run
+  it, the 2026-09-03 baseline (95.99% statement coverage against a 69.57%
+  mutation score), and how to read a surviving mutant.
+
 ## Compatibility
 
 - [Calculator compatibility baseline](./compatibility.md) — the package-root

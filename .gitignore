@@ -6,3 +6,7 @@ coverage/
 
 # Generated sample report (HBSP-27) — produced in CI for Pages, never committed
 report/
+
+# Mutation testing (Stryker) — generated, never committed
+.stryker-tmp/
+reports/

@@ -44,7 +44,8 @@
     "report:sample": "npm run build && node scripts/generate-sample-report.mjs",
     "test:watch": "vitest",
     "prepack": "npm run verify",
-    "prepublishOnly": "npm run verify"
+    "prepublishOnly": "npm run verify",
+    "mutate": "stryker run"
   },
   "keywords": [
     "screenplay",
@@ -59,9 +60,14 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
     "@types/node": "^22.10.0",
     "@vitest/coverage-v8": "^4.1.10",
     "typescript": "^5.7.0",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "qs": "^6.16.0"
   }
 }

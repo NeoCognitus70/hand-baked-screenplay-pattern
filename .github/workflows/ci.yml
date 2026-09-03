@@ -43,3 +43,36 @@ jobs:
         if: matrix.node == 20
         continue-on-error: true
         run: npm run coverage
+
+  # Mutation testing (HBSP-34). Visibility only, mirroring the coverage stance
+  # above: `thresholds.break` is null in stryker.config.json, and the step is
+  # continue-on-error, so a falling score reports but never fails the build.
+  # Runs as its own job so it does not slow the verify matrix.
+  mutation:
+    name: mutation score (informational, no gate)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Mutation test
+        continue-on-error: true
+        run: npm run mutate
+
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mutation-report
+          path: reports/mutation/
+          if-no-files-found: warn
+          retention-days: 14
