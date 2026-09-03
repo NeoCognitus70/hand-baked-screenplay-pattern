@@ -1,0 +1,50 @@
+# .gitattributes — hand-baked-screenplay-pattern
+#
+# Purpose: pin line endings so they stay deterministic. This is PREVENTIVE, not
+# a repair — verified 2026-09-03, all tracked blobs are already pure LF and
+# `git add --renormalize .` stages nothing. No normalisation pass is needed now
+# or when this lands.
+#
+# Why commit it: this repo has no .gitattributes, so on a Windows checkout with
+# the default core.autocrlf=true Git rewrites the working tree to CRLF and warns
+# on every write ("LF will be replaced by CRLF"). Committed attributes stop that
+# at source and, unlike per-clone config, travel with the repo.
+#
+# Tracked today: only .ts, .md, .json, .mjs, .yml and .gitignore — no binaries.
+# The binary rules below are forward-looking (e.g. a .tgz packed by the release
+# smoke is a build artefact and is gitignored, never committed), not a
+# description of current contents.
+
+# Default: treat everything as text, auto-detect, normalise to LF.
+* text=auto eol=lf
+
+# --- Explicit text, LF ------------------------------------------------------
+*.ts            text eol=lf
+*.mts           text eol=lf
+*.cts           text eol=lf
+*.js            text eol=lf
+*.mjs           text eol=lf
+*.cjs           text eol=lf
+*.json          text eol=lf
+*.jsonc         text eol=lf
+*.md            text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.html          text eol=lf
+*.css           text eol=lf
+*.sh            text eol=lf
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
+
+# --- Binary (never normalise, never diff as text) ---------------------------
+# Forward-looking: none of these are tracked today.
+*.tgz   binary
+*.gz    binary
+*.zip   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
