@@ -7,6 +7,22 @@
 
 # Hand-Baked Screenplay Pattern — Backlog
 
+**Version:** 20 — **HBSP-34 COMPLETE** (2026-09-03): a mutation-testing lane (Stryker, Apache-2.0)
+now measures test-suite *quality* rather than execution. The first baseline records a **69.57%
+mutation score against 95.99% statement coverage** — a 26-point gap that quantifies how much of the
+suite observes rather than asserts. 620 mutants killed, 235 survived, 38 uncovered, 0 errors. The
+core Screenplay building blocks score well (`scene.ts`, `ConsoleReporter.ts`, `Cast`, `Interaction`,
+`Task` at 100%; `Actor.ts` 97.14%); the weak areas are `Send.ts` (15.79%), `util.ts` (38.82%) and
+`ProviderConformance.ts` (66.42%, 91 survivors). The **score** is visibility only —
+`thresholds.break` is null, mirroring the coverage stance from HBSP-12 — but the **lane** gates: the
+CI step is deliberately not `continue-on-error`, because with no break threshold any non-zero exit
+means Stryker itself failed. The first CI run proved the point by going green while producing
+nothing (job pinned to Node 20; Stryker requires ≥22), which is the failure mode the final
+configuration prevents. Adding
+Stryker introduced three transitive dev-only advisories; all are cleared and `npm audit` reports
+**0 vulnerabilities**. Remediation of the 235 survivors is **not** promoted — see *Potential Next
+Steps*. Outstanding items remain **0**. Details in [`docs/mutation-testing.md`](./mutation-testing.md).
+
 **Version:** 19 — **v0.3.0 RELEASED** (2026-08-17): lightweight tag `v0.3.0` points to the PR #54
 merge commit `3560e76`; release workflow run
 [`32057409492`](https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/actions/runs/32057409492)
@@ -289,6 +305,53 @@ that gate, and attaches the versioned tarball and checksum to the matching GitHu
 tag `v0.3.0` now points to merge commit `3560e76`; workflow run `32057409492` published the release,
 and an independent download matched the attached SHA-256 checksum
 `ac5bd1f6d9bddf95c9a42f99f05f093c7875b1835ecd3ae0d5ca2385e810c36d`.
+
+---
+
+### Test-suite quality (HBSP-34) — Delivered 2026-09-03
+
+#### HBSP-34: Establish a mutation-testing lane and record the first baseline — Score: 9 — ✅ COMPLETE 2026-09-03
+
+**Priority Score:** Security Impact (1) + Breakage Probability (3) + Maintenance Burden (5) = **9 points**
+
+**Origin:** `PORTFOLIO_CANDIDATE_PROJECTS_RESEARCH_2026-09-02.md` §4.1 (portfolio-level research,
+PR #130), which identified mutation testing as the portfolio's strongest Tier A gap — no new system
+under test, no Docker, no RAM — and named this project as the substrate because its mature suite and
+high coverage make it the place where the claim can be tested honestly.
+
+**Objective:** measure whether this suite's high line coverage corresponds to real assertions, and
+leave a repeatable lane behind. Explicitly a **measurement** exercise: raising the score is separate,
+later, owner-promoted work.
+
+**Acceptance criteria:**
+- [x] Add Stryker (Apache-2.0) as a dev dependency with a `npm run mutate` script and a committed
+      `stryker.config.json`.
+- [x] Configure it as **visibility only** — `thresholds.break: null` — matching the coverage stance
+      established by HBSP-12; a falling score must never fail a build.
+- [x] Run a full baseline and record the score alongside the coverage figure it should be read
+      against.
+- [x] Add a CI job that runs the lane and uploads the report as an artefact, `continue-on-error` so
+      it never gates.
+- [x] Leave `npm audit` at **0 vulnerabilities** — adding tooling must not regress the clean record
+      established by HBSP-09.
+- [x] Document what mutation testing measures, how to run it, the baseline, and how to read a
+      surviving mutant. **Type:** test tooling + CI + docs.
+
+**Status:** ✅ COMPLETE 2026-09-03. Baseline: **69.57% mutation score** (72.64% over covered code)
+against **95.99% statement coverage** — 620 killed, 235 survived, 38 no-coverage, 4 timeouts,
+0 errors, 5m46s. The 26-point gap is the deliverable: it retires the reading that ~96% coverage means
+~96% tested. Strongest areas are the core building blocks (`scene.ts`, `ConsoleReporter.ts`,
+`Ability`, `Cast`, `Interaction`, `Task`, `Expectation` all 100%; `Actor.ts` 97.14%), which is where
+the strength should be. Weakest is `src/abilities/http/Send.ts` at 15.79%: its four-clause validation
+guard on line 34 has full statement coverage, yet **six mutants survive on that one line** — every
+clause can be inverted or removed and no test notices. `util.ts` (38.82%), the error types
+(33.33%) and `ProviderConformance.ts` (66.42%, the largest single concentration at 91 survivors)
+follow. Adding Stryker pulled in three transitive dev-only advisories (`nanoid` high, `qs` moderate
+×2 via `typed-rest-client`); `npm audit fix` cleared the high and a narrow `qs: ^6.16.0` override
+cleared the rest, so `npm audit` reports **0 vulnerabilities** and `npm audit --omit=dev` confirms
+nothing ships. `npm run verify` remains green at 18 files / 128 tests. Barrel files and `src/sample/`
+are excluded from mutation and that exclusion is stated in the docs, because excluding files flatters
+the score.
 
 ---
 
@@ -785,7 +848,7 @@ added an interleaved Ada/Bob trace cross-referencing §6. Docs-only. Review Risk
 | MEDIUM (10–19) | 0 | — | — |
 | LOW (0–9) | 0 | — | — |
 | **Total Outstanding** | **0** | **—** | **Provider-first sequence complete** |
-| Resolved | 33 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..33 (2026-08-17) |
+| Resolved | 34 | — | Item #1 (2026-06-13); Items #2–#7 / HBSP-09..14 (2026-06-17); Items #8–#15 / HBSP-15..22 (2026-07-07); Items #16–#20 / TRIAGE-01..05 (2026-07-19); Items #21–#26 / CGX-01..06 (2026-07-27); HBSP-27 (2026-08-04); HBSP-28..33 (2026-08-17); HBSP-34 (2026-09-03) |
 
 ---
 
@@ -806,9 +869,18 @@ consumer-side pilot in `calculator-screenplay-bdd` only by explicit owner decisi
 
 ### LOW Priority
 
-None. Optional Serenity parity, Cypress integration, cross-language vectors and consumer migrations
-remain deliberately unpromoted; the portfolio viability assessment is evidence, not authorisation
-outside HBSP-28..33.
+None promoted. Optional Serenity parity, Cypress integration, cross-language vectors and consumer
+migrations remain deliberately unpromoted; the portfolio viability assessment is evidence, not
+authorisation outside HBSP-28..33.
+
+**Available but unpromoted — mutation-score remediation.** HBSP-34 recorded 235 surviving mutants
+(see [`docs/mutation-testing.md`](./mutation-testing.md)). Closing them is *not* scheduled and needs
+an explicit owner decision, because chasing a mutation score produces tests that assert
+implementation detail unless it is done selectively. If it is ever promoted, the defensible order is
+by concentration and by value: `src/abilities/http/Send.ts` first (15.79%, the clearest genuine gap —
+a validation guard with six survivors on one line), then `util.ts` (38.82%), then a judgement call on
+`ProviderConformance.ts` (91 survivors, but much of that surface is deliberately permissive). Do not
+raise `thresholds.break` until a score has held steady across several cycles.
 
 ---
 

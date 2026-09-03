@@ -322,6 +322,12 @@ spec/            Vitest specs, including end-to-end worked examples
 | `npm test`             | Run the Vitest suite. |
 | `npm run test:package` | Pack and install into clean ESM/CommonJS runtime and type fixtures. |
 | `npm run verify`       | Run typecheck, build, unit tests, and both packed-package smokes. |
+| `npm run mutate`       | Mutation-test the suite with Stryker (informational; never gates). |
+
+Mutation testing measures whether the tests *assert* behaviour or merely *execute* it. The current
+baseline is a **69.57% mutation score against 95.99% statement coverage** — see
+[`docs/mutation-testing.md`](./docs/mutation-testing.md) for what that gap means and how to read a
+surviving mutant.
 
 ## Versioning & changelog
 
