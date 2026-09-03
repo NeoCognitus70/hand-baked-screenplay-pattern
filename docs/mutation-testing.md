@@ -57,6 +57,11 @@ Measured on `main` at the v0.3.0 line, 18 spec files / 128 tests.
 | Mutants with no coverage | 38 |
 | Errors / timeouts | 0 / 4 |
 
+> **Expect ±0.5% run to run.** The first CI run scored **69.12%** against the same commit: 620
+> killed either way, but the 4 mutants that *timed out* locally instead *survived* on the faster CI
+> runner, moving them from one bucket to the other. Timeout classification is machine-dependent, so
+> treat small movements as noise and only read sustained shifts as signal.
+
 **The headline is the 26-point gap between 95.99% statement coverage and a 69.57% mutation score.**
 That gap is the honest measure of how much of this suite is *observation* rather than *assertion*.
 The number is not a failure — a first mutation score near 70% on a suite never written with mutation
