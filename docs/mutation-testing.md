@@ -17,15 +17,30 @@ The run takes roughly six minutes on a normal laptop and writes a browsable repo
 `reports/mutation/index.html` plus a machine-readable `reports/mutation/mutation.json`. Both are
 gitignored; CI uploads them as a build artefact.
 
-## The stance: visibility, not a gate
+> **Requires Node ≥ 22.** That is StrykerJS's own floor, not the library's. This package still
+> supports **Node ≥ 20** — the verify matrix tests 20, 22 and 24, and `engines` is unchanged. If you
+> are on Node 20 the suite runs fine and only `npm run mutate` is unavailable.
 
-`thresholds.break` is `null`, and the CI step is `continue-on-error`. **A falling mutation score
-reports but never fails the build.** This deliberately mirrors the stance the coverage config takes
-(HBSP-12): the number is there to be looked at, not to be gamed or to block unrelated work.
+## The stance: the score never gates, but the lane does
+
+`thresholds.break` is `null`, so **a falling mutation score never fails the build**. That mirrors the
+stance the coverage config takes (HBSP-12): the number is there to be looked at, not to be gamed or
+to block unrelated work.
 
 Raising `thresholds.break` to a real value is a decision to take **later and on purpose**, once the
 score has been stable across a few cycles. Setting a gate on the first measurement would only invite
 tests written to kill mutants rather than to express behaviour.
+
+The CI step is deliberately **not** `continue-on-error`, and that is not a contradiction. Because a
+low score cannot produce a non-zero exit, any non-zero exit means *Stryker itself* failed — a crash,
+a bad config, an unsupported runtime. Those must be loud. A mutation job that silently reports
+nothing while showing green is worse than having no job at all: it manufactures false confidence.
+For the same reason the artefact upload uses `if-no-files-found: error` — a missing report is a
+failure, not a warning.
+
+This is not hypothetical. The first CI run of this lane went **green while producing nothing**: the
+job was pinned to Node 20, Stryker refused to start, and `continue-on-error` swallowed the exit code.
+The configuration above is the fix.
 
 ## Baseline — 2026-09-03
 

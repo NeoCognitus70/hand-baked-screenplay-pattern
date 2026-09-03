@@ -44,10 +44,22 @@ jobs:
         continue-on-error: true
         run: npm run coverage
 
-  # Mutation testing (HBSP-34). Visibility only, mirroring the coverage stance
-  # above: `thresholds.break` is null in stryker.config.json, and the step is
-  # continue-on-error, so a falling score reports but never fails the build.
-  # Runs as its own job so it does not slow the verify matrix.
+  # Mutation testing (HBSP-34). Runs as its own job so it does not slow the
+  # verify matrix.
+  #
+  # The SCORE never gates: `thresholds.break` is null in stryker.config.json, so
+  # Stryker does not exit non-zero however low the score falls -- the same
+  # visibility-only stance the coverage step above takes (HBSP-12).
+  #
+  # The LANE does gate, deliberately. Because a low score cannot produce a
+  # non-zero exit, any non-zero exit means Stryker itself failed: a crash, a bad
+  # config, an unsupported runtime. A mutation job that silently reports nothing
+  # is worse than no job at all, so there is no continue-on-error here and a
+  # missing report is an upload error rather than a warning.
+  #
+  # Node 24: StrykerJS requires Node >=22. The library itself still supports
+  # Node 20 (see the verify matrix and package.json engines) -- this floor
+  # belongs to the dev tool, not to the package.
   mutation:
     name: mutation score (informational, no gate)
     runs-on: ubuntu-latest
@@ -55,17 +67,16 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v5
 
-      - name: Set up Node 20
+      - name: Set up Node 24
         uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
       - name: Mutation test
-        continue-on-error: true
         run: npm run mutate
 
       - name: Upload mutation report
@@ -74,5 +85,5 @@ jobs:
         with:
           name: mutation-report
           path: reports/mutation/
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 14

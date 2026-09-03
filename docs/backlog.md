@@ -13,8 +13,12 @@ mutation score against 95.99% statement coverage** — a 26-point gap that quant
 suite observes rather than asserts. 620 mutants killed, 235 survived, 38 uncovered, 0 errors. The
 core Screenplay building blocks score well (`scene.ts`, `ConsoleReporter.ts`, `Cast`, `Interaction`,
 `Task` at 100%; `Actor.ts` 97.14%); the weak areas are `Send.ts` (15.79%), `util.ts` (38.82%) and
-`ProviderConformance.ts` (66.42%, 91 survivors). The lane is **visibility only** — `thresholds.break`
-is null and the CI step is `continue-on-error`, mirroring the coverage stance from HBSP-12. Adding
+`ProviderConformance.ts` (66.42%, 91 survivors). The **score** is visibility only —
+`thresholds.break` is null, mirroring the coverage stance from HBSP-12 — but the **lane** gates: the
+CI step is deliberately not `continue-on-error`, because with no break threshold any non-zero exit
+means Stryker itself failed. The first CI run proved the point by going green while producing
+nothing (job pinned to Node 20; Stryker requires ≥22), which is the failure mode the final
+configuration prevents. Adding
 Stryker introduced three transitive dev-only advisories; all are cleared and `npm audit` reports
 **0 vulnerabilities**. Remediation of the 235 survivors is **not** promoted — see *Potential Next
 Steps*. Outstanding items remain **0**. Details in [`docs/mutation-testing.md`](./mutation-testing.md).
