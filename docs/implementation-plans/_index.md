@@ -12,4 +12,4 @@ Every implementation plan is written to a file here before implementation starts
 
 | Plan | Item | Presented | Status | Delivered |
 |---|---|---|---|---|
-| [`2026-11-07_release-workflow-no-runs-resolution.md`](2026-11-07_release-workflow-no-runs-resolution.md) | HBSP-35 Release workflow NO RUNS status resolution | 2026-11-07 | proposed | not yet |
+| [`2026-11-07_release-workflow-no-runs-resolution.md`](2026-11-07_release-workflow-no-runs-resolution.md) | HBSP-35 Release workflow NO RUNS status resolution | 2026-11-07 | implemented | [PR #58](https://github.com/NeoCognitus70/hand-baked-screenplay-pattern/pull/58) merged 2026-11-07 at 9c811af |
