@@ -82,3 +82,13 @@ npm pack --dry-run --ignore-scripts
 
 Only `package.json`, `LICENSE`, `README.md`, `CHANGELOG.md`, and `dist/**` belong
 in the artifact. Runtime `dependencies` must remain absent.
+
+## Manual build and packaging verification (dry run)
+
+The release workflow supports `workflow_dispatch` with a `dry_run` input (defaulting to `true`). On the `main` branch or any branch without a release tag, maintainers or CI monitoring can run:
+
+```bash
+gh workflow run release.yml --ref main -f dry_run=true
+```
+
+In dry-run mode, the workflow runs `npm ci`, full `npm run verify` (typecheck, dual ESM/CJS build, unit tests, and packed package smoke fixtures), builds the tarball with `npm pack`, and calculates the SHA-256 checksum. This confirms packaging health and establishes a verified run record on `main` without creating or modifying GitHub releases.
